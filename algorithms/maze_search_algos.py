@@ -1,12 +1,12 @@
-def maze_dijkstra(draw, grid, start, end, is_bidirectional=False):
-    pass
-
-
 def maze_bfs(draw, grid, start, end, is_bidirectional=False):
     pass
 
 
 def maze_dfs(draw, grid, start, end, is_bidirectional=False):
+    pass
+
+
+def maze_dijkstra(draw, grid, start, end, is_bidirectional=False):
     pass
 
 

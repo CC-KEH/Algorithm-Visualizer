@@ -1,3 +1,4 @@
+from ctypes.wintypes import tagRECT
 import pygame  # type: ignore
 import os
 import sys
@@ -17,11 +18,15 @@ class Cell:
         self.row = row * size
         self.col = col * size
         self.color = WHITE
+        self.target_color = WHITE
         self.y = col * size
         self.x = row * size
         self.neighbors = []
         self.size = size
         self.total_rows = total_rows
+        self.animation_radius = 0
+        self.animating = False
+        self.animation_speed = 2
 
     def draw(self, win):
         pygame.draw.rect(
@@ -260,6 +265,7 @@ def main(win, width):
                     search_algorithm(
                         lambda: draw(win, grid, ROWS, width), grid, start, end, algo
                     )
+
     pygame.quit()
 
 
