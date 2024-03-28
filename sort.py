@@ -1,7 +1,7 @@
 import pygame
 import random
 from themes.colors import *
-
+from algorithms.sort_algos import *
 pygame.init()
 
 SIDE_PADDING = 100  # 50 on left and 50 on right
