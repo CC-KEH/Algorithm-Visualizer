@@ -1,4 +1,4 @@
-from themes.colors import *
+from src.themes.colors import *
 
 themes = {
     "Default": {
@@ -9,7 +9,7 @@ themes = {
         "open_color": GREEN,
         "plane_color": WHITE,
         "closed_color": RED,
-        "bg_color": GREY,
+        "bg_color": LIGHT_GREY,
     },
     "Night": {
         "start_color": TURQUOISE,

@@ -1,12 +1,8 @@
-from ctypes.wintypes import tagRECT
 import pygame  # type: ignore
-import os
-import sys
+from src.themes.colors import *
+from src.themes.themes import themes
+from src.algorithms.maze_search_algos import *
 
-from themes.colors import *
-from themes.themes import themes
-from algorithms.maze_search_algos import *
-from algorithms.maze_gen_algos import *
 
 WIDTH = 800
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
@@ -15,8 +11,8 @@ theme_type = "Default"
 
 class Cell:
     def __init__(self, row, col, size, total_rows):
-        self.row = row * size
-        self.col = col * size
+        self.row = row
+        self.col = col
         self.color = WHITE
         self.target_color = WHITE
         self.y = col * size
@@ -34,28 +30,17 @@ class Cell:
         )
 
     def update_neighbors(self, grid):
-
-        # Up
-        if self.row > 1 and not grid[self.row - 1][self.col].is_barrier():
+        if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_barrier(): # DOWN
+            self.neighbors.append(grid[self.row + 1][self.col]) 
+        
+        if self.row > 0 and not grid[self.row - 1][self.col].is_barrier(): # UP
             self.neighbors.append(grid[self.row - 1][self.col])
-
-        # Down
-        if (
-            self.row < self.total_rows - 1
-            and not grid[self.row + 1][self.col].is_barrier()
-        ):
-            self.neighbors.append(grid[self.row + 1][self.col])
-
-        # Left
-        if self.col > 1 and not grid[self.row][self.col - 1].is_barrier():
-            self.neighbors.append(grid[self.row][self.col - 1])
-
-        # Right
-        if (
-            self.col < self.total_rows - 1
-            and not grid[self.row][self.col + 1].is_barrier()
-        ):
+        
+        if self.col < self.total_rows - 1 and not grid[self.row][self.col + 1].is_barrier(): # RIGHT
             self.neighbors.append(grid[self.row][self.col + 1])
+        
+        if self.col > 0 and not grid[self.row][self.col - 1].is_barrier(): # LEFT
+            self.neighbors.append(grid[self.row][self.col - 1])
 
     def __lt__(self, other) -> bool:
         return False
@@ -100,18 +85,6 @@ class Cell:
         self.color = themes[theme_type]["path_color"]
 
 
-def h(p1, p2):
-    """Calculate heuristic using Manhattan distance
-
-    Args:
-        p1 (x,y): coordinates of point1
-        p2 (x,y): coordinates of point2
-    """
-    x1, y1 = p1
-    x2, y2 = p2
-    return abs(x2 - x1) + abs(y2 - y1)
-
-
 def make_grid(rows, width):
     """Makes the Grid
 
@@ -140,9 +113,9 @@ def draw_grid_lines(win, rows, width):
     """
     cell_size = width // rows
     for r in range(rows):
-        pygame.draw.line(win, GREY, (0, r * cell_size), (width, r * cell_size))
+        pygame.draw.line(win, LIGHT_GREY, (0, r * cell_size), (width, r * cell_size))
         for c in range(rows):
-            pygame.draw.line(win, GREY, (c * cell_size, 0), (c * cell_size, width))
+            pygame.draw.line(win, LIGHT_GREY, (c * cell_size, 0), (c * cell_size, width))
 
 
 def draw(win, grid, rows, width):
@@ -186,29 +159,30 @@ def get_clicked_pos(pos, rows, width):
 
 def search_algorithm(draw, grid, start, end, algo):
     search_algos = {
-        "Dijkstra": maze_dijkstra,
-        "Breadth First Search": maze_bfs,
-        "Depth First Search": maze_dfs,
+        # "Dijkstra": maze_dijkstra,
+        # "Breadth First Search": maze_bfs,
+        # "Depth First Search": maze_dfs,
         "A*": maze_astar,
-        "Bidirectional BFS": maze_bfs,
-        "Bidirectional DFS": maze_dfs,
-        "Bidirectional A*": maze_astar,
-        "Bellman-Ford": maze_bellman_ford,
-        "Floyd-Warshall": maze_floyd_warshall,
-        "Jump Point Search": maze_jump_point,
+        # "Bidirectional BFS": maze_bfs,
+        # "Bidirectional DFS": maze_dfs,
+        # "Bidirectional A*": maze_astar,
+        # "Bellman-Ford": maze_bellman_ford,
+        # "Floyd-Warshall": maze_floyd_warshall,
+        # "Jump Point Search": maze_jump_point,
     }
+    search_algos[algo](draw,grid,start,end)
 
 
-def generate_maze(draw, grid, algo):
-    gen_algos = {
-        "Recursive Backtracker": recursive_backtracker,
-        "Prim's Algorithm": prims_algorithm,
-        "Kruskal's Algorithm": kruskals_algorithm,
-        "Binary Tree": binary_tree,
-        "Sidewinder": sidewinder,
-        "Recursive Division": recursive_division,
-        "Eller's Algorithm": ellers_algorithm,
-    }
+# def generate_maze(draw, grid, algo):
+#     gen_algos = {
+#         "Recursive Backtracker": recursive_backtracker,
+#         "Prim's Algorithm": prims_algorithm,
+#         "Kruskal's Algorithm": kruskals_algorithm,
+#         "Binary Tree": binary_tree,
+#         "Sidewinder": sidewinder,
+#         "Recursive Division": recursive_division,
+#         "Eller's Algorithm": ellers_algorithm,
+#     }
 
 
 def main(win, width):
@@ -221,7 +195,7 @@ def main(win, width):
     run = True
     started = False
 
-    algo = "Dijkstra"
+    algo = "A*"
     while run:
         draw(WIN, grid, ROWS, width)
         for event in pygame.event.get():
@@ -258,13 +232,17 @@ def main(win, width):
                     end = None
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not started:
+                if event.key == pygame.K_SPACE and start and end:
                     for row in grid:
                         for cell in row:
                             cell.update_neighbors(grid)
-                    search_algorithm(
-                        lambda: draw(win, grid, ROWS, width), grid, start, end, algo
-                    )
+                    # search_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end, algo)
+                    maze_astar(lambda: draw(win, grid, ROWS, width), grid, start, end)
+
+                if event.key == pygame.K_c:
+                    start = None
+                    end = None
+                    grid = make_grid(ROWS, width)
 
     pygame.quit()
 
