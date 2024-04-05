@@ -5,7 +5,7 @@ import sys
 import os
 
 from themes.colors import *
-from Algorithm_Visualizer.sort.sort_algos import *
+from sort_algos import *
 pygame.init()
 
 SIDE_PADDING = 100  # 50 on left and 50 on right

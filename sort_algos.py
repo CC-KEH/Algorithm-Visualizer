@@ -1,4 +1,4 @@
-from Algorithm_Visualizer.sort.sort import *
+from sort import *
 from themes.colors import *
 MIN_MERGE = 32
 
