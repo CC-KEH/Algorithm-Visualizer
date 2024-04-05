@@ -84,7 +84,7 @@ def main():
     draw_info = DrawInformation(800, 600, lst)
     sorting = False
     ascending = True
-    sorting_algorithm = bubble_sort
+    sorting_algorithm = merge_sort
     sorting_algorithm_name = "Bubble Sort"
     sorting_algorithm_generator = None
     low = 0

@@ -29,11 +29,12 @@ def selection_sort(draw_info, arr, low, high, ascending=True):
         for j in range(i + 1, high):
             if (arr[j] < arr[min_idx] and ascending) or (arr[j] > arr[min_idx] and not ascending) :
                 min_idx = j
+                draw_list(draw_info, {i: 'green', min_idx: 'red'}, clear_bg=True)
+                yield True
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
         draw_list(draw_info, {i: 'green', min_idx: 'red'}, clear_bg=True)
         yield True
     return arr
-
 
 def insertion_sort(draw_info,arr,low,high,ascending=True):
     for i in range(low, high):
@@ -49,46 +50,55 @@ def insertion_sort(draw_info,arr,low,high,ascending=True):
         yield True
     return arr
 
-def merge(draw_info, arr, left_half, right_half,ascending=True):
-    i = j = 0
-    while i < len(left_half) and j < len(right_half):
-        if left_half[i] < right_half[j]:
-            arr[i + j] = left_half[i]
-            i += 1
-        else:
-            arr[i + j] = right_half[j]
-            j += 1
-        draw_list(draw_info, {i + j: 'green'}, clear_bg=True)
-        yield True
-
-    while i < len(left_half):
-        arr[i + j] = left_half[i]
-        i += 1
-        draw_list(draw_info, {i + j: 'green'}, clear_bg=True)
-        yield True
-
-    while j < len(right_half):
-        arr[i + j] = right_half[j]
-        j += 1
-        draw_list(draw_info, {i + j: 'green'}, clear_bg=True)
-        yield True
-
+def merge(draw_info,arr, l, m, r): 
+    len1, len2 = m - l + 1, r - m
+    left, right = [], [] 
+    for i in range(0, len1): 
+        left.append(arr[l + i])
+         
+    for i in range(0, len2):
+        right.append(arr[m + i + 1])
     
-def merge_sort(draw_info, arr, low, high,ascending=True):
+    i, j, k = 0, 0, l 
+
+    while i < len1 and j < len2: 
+        if left[i] <= right[j]: 
+            arr[k] = left[i] 
+            i += 1
+
+        else: 
+            arr[k] = right[j] 
+            j += 1
+        draw_list(draw_info, {k: 'green'}, clear_bg=True)
+        yield True
+        k += 1
+  
+    while i < len1: 
+        arr[k] = left[i] 
+        k += 1
+        i += 1
+        draw_list(draw_info, {}, clear_bg=True)
+        yield True
+        
+    while j < len2: 
+        arr[k] = right[j] 
+        k += 1
+        j += 1
+        draw_list(draw_info, {}, clear_bg=True)
+        yield True
+
+def merge_sort(draw_info,arr,low,high,ascending=True):
     if low < high:
-        mid_point = (low + high) // 2
-        yield from merge_sort(draw_info, arr, low, mid_point)
-        yield from merge_sort(draw_info, arr, mid_point + 1, high)
-        left_half = arr[low:mid_point + 1]
-        right_half = arr[mid_point + 1:high + 1]
-        yield from merge(draw_info, arr[low:high + 1], left_half, right_half)
+        mid = (low + high) // 2
+        yield from merge_sort(draw_info, arr, low, mid)
+        yield from merge_sort(draw_info, arr, mid + 1, high)
+        yield from merge(draw_info, arr, low, mid, high)
     return arr
 
-    
 def partition(draw_info, arr, low, high):
     pivot = arr[high]
     smallest_idx = low - 1
-    for i in range(low, high):
+    for i in range(low, high+1):
         if arr[i] < pivot:
             smallest_idx += 1
             arr[i], arr[smallest_idx] = arr[smallest_idx], arr[i]
@@ -99,51 +109,39 @@ def partition(draw_info, arr, low, high):
     draw_list(draw_info, {pivot_idx: 'blue'}, clear_bg=True)
     yield pivot_idx
 
-
-def quick_sort(draw_info, arr, low, high,ascending=True):
+def quick_sort(draw_info, arr, low, high, ascending=True):
     if low < high:
-        pivot_idx = yield from partition(draw_info, arr, low, high-1)
-        yield from quick_sort(draw_info, arr, low, pivot_idx - 1)
-        yield from quick_sort(draw_info, arr, pivot_idx + 1, high)
+        pivot_gen = partition(draw_info, arr, low, high - 1)
+        pivot_idx = None
+        for val in pivot_gen:
+            pivot_idx = val
+        if pivot_idx is not None:
+            yield from quick_sort(draw_info, arr, low, pivot_idx)
+            yield from quick_sort(draw_info, arr, pivot_idx+1, high)
     return arr
 
 def counting_sort(draw_info,arr, low, high, ascending=True, place=None):
-    temp_arr = [0] * high
-    freq_arr = [0] * high
+    max_val = max(arr)
+    freq_arr = [0] * (max_val+1)
     
-    if place is None:    
-        for i in range(high):
-            freq_arr[arr[i]] += 1
-    else:
-        for i in range(high):
-            index = arr[i] // place
-            freq_arr[index % 10] += 1
-            
-    for i in range(1, len(freq_arr)):
+    for num in arr:
+        freq_arr[num] += 1
+
+    for i in range(1, max_val + 1):
         freq_arr[i] += freq_arr[i - 1]
-    
-    i = high - 1
-    
-    if place is None:
-        while i >= low:
-            temp_arr[freq_arr[arr[i]] - 1] = arr[i]
-            freq_arr[arr[i]] -= 1
-            i -= 1    
-            yield True
-    else:
-        while i >= low:
-            index = arr[i] // place
-            temp_arr[freq_arr[index % 10] - 1] = arr[i]
-            freq_arr[index % 10] -= 1
-            i -= 1
-            yield True
         
-    for i in range(high):
-        arr[i] = temp_arr[i]
+    output_array = [0] * len(arr)
+ 
+    for i in range(len(arr) - 1, -1, -1):
+        output_array[freq_arr[arr[i]] - 1] = arr[i]
+        freq_arr[arr[i]] -= 1
+    
+    for i in range(len(arr)):
+        arr[i] = output_array[i]
+        draw_list(draw_info, {i: 'green'}, clear_bg=True)
         yield True
     
-    draw_list(draw_info, {})  # Draw the final sorted list
-    return arr
+    return output_array
         
 def radix_sort(draw_info,arr, low, high, ascending=True):
     max_ele = max(arr)
@@ -172,12 +170,11 @@ def bucket_sort(draw_info,arr, low, high, ascending=True):
     draw_info.lst = final_arr  # Update the list in draw_info with the final sorted array
     yield True  # Yield after the final array is assigned back to draw_info
 
-
 def tim_sort(draw_info,arr, low, high, ascending=True):
     min_run = calculate_min_run(high)
     for i in range(low, high, min_run):
         end = min((i + min_run - 1), high - 1)
-        yield from insertion_sort(arr, i, end)
+        yield from insertion_sort(draw_info,arr, i, end+1)
 
     size = min_run
 
@@ -186,5 +183,5 @@ def tim_sort(draw_info,arr, low, high, ascending=True):
             mid = min((left + size - 1), (high - 1))
             right = min((left + 2 * size - 1), (high - 1))
             if mid < right:
-                yield from merge(arr, left, mid, right)
+                yield from merge(draw_info, arr, left, mid, right)
         size = 2 * size
