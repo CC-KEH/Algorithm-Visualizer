@@ -1,418 +1,93 @@
+from grid import WIDTH
 import pygame
-from grid import *
-from themes.colors import *
-from themes.animations import *
-from system import *
-from maze_search_algos import *
-from maze_gen_algos import *
+import sys
+import maze_main
+import sort_main
+from themes.colors import DARK_GREEN, TEAL
 
+# Initialize Pygame
+pygame.init()
 
-def main(win, width):
-    theme_type = "Default"
-    ROWS = 50
-    w, ht = pygame.display.get_surface().get_size()
-    width = ht
-    grid = make_grid(ROWS, width)
-    delta = w - width
+# Constants
+WINDOW_WIDTH = 1500
+WINDOW_HEIGHT = 800
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (150, 150, 150)
+INACTIVE_BUTTON_COLOR = TEAL
+ACTIVE_BUTTON_COLOR = (3, 55, 61)
+FONT_SIZE = 48
+BUTTON_WIDTH = 500
+BUTTON_HEIGHT = 300
+BOTTOM_SECTION_HEIGHT = 300
 
-    top_start = ht/13
-    but_height = ht//15
-    but_width = delta//4
-    gap_factor = 5  # * Determines the gap between the buttons
-    # * Determines the coordinate from where the button start in x-axis.
-    start_factor = 10
+# Set up the window
+window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+pygame.display.set_caption("Start Menu")
 
-    algorithms = [
-        button(width+delta//start_factor, top_start,
-               but_width-but_height, but_height, 'BFS'),
+# Function to create text objects
+def text_objects(text, font, color):
+    text_surface = font.render(text, True, color)
+    return text_surface, text_surface.get_rect()
 
-        button(width+delta//start_factor, top_start + (6*but_height//2),
-               but_width-but_height, but_height, 'DFS'),
+# Function to display text on screen
+def display_text(text, x, y, color, font_size=FONT_SIZE):
+    large_text = pygame.font.Font(None, font_size)
+    text_surf, text_rect = text_objects(text, large_text, color)
+    text_rect.center = (x, y)
+    window.blit(text_surf, text_rect)
 
-        button(width+delta//start_factor, top_start + (3*but_height//2),
-               but_width-but_height, but_height, 'Bi-BFS'),
+# Function to create buttons
+def button(msg, x, y, width, height, inactive_color, active_color, action=None):
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
 
-        button(width+delta//start_factor + (gap_factor*but_width//4),
-               top_start, but_width-but_height, but_height, "A*"),
+    if x + width > mouse[0] > x and y + height > mouse[1] > y:
+        pygame.draw.rect(window, active_color, (x, y, width, height))
+        if click[0] == 1 and action is not None:
+            action()
+    else:
+        pygame.draw.rect(window, inactive_color, (x, y, width, height))
 
-        button(width+delta//start_factor + (gap_factor*but_width//4), top_start +
-               (3*but_height//2), but_width-but_height, but_height, 'IDA*'),
+    display_text(msg, x + width // 2, y + height // 2, WHITE)
 
-        button(width+delta//start_factor + (gap_factor*but_width//4), top_start +
-               (6*but_height//2), but_width-but_height, but_height, 'Bi-A*'),
+# Function to start the pathfinding visualizer
+def start_pathfinding_visualizer():
+    print("Starting Pathfinding Visualizer")
+    width = WIDTH
+    win = pygame.display.set_mode((WIDTH+700, WIDTH))
+    maze_main.main(win,width)
 
-        button(width+delta//start_factor + ((gap_factor * 2)*but_width//4),
-               top_start, but_width-but_height, but_height, 'Dijkstra'),
-    ]
+# Function to start the sorting visualizer
+def start_sorting_visualizer():
+    print("Starting Sorting Visualizer")
+    width = WIDTH
+    win = pygame.display.set_mode((WIDTH+700, WIDTH))
+    sort_main.main(win,width)
 
-    top_start = top_start + (1.9*(3*but_height//2)) + but_height + ht//10
-    but_height = ht//15
-    but_width = delta//4
-    mazes = [
-        button(width+delta//start_factor, top_start,
-               but_width-but_height, but_height, "DFS Maze"),
+# Function to quit the game
+def quit_game():
+    pygame.quit()
+    sys.exit()
 
-        button(width+delta//start_factor + (gap_factor*but_width//4),
-               top_start, but_width-but_height, but_height, "Random"),
-
-        button(width+delta//start_factor + ((gap_factor*2)*but_width//4),
-               top_start, but_width-but_height, but_height, "Kruskal"),
-
-        button(width+delta//start_factor + ((gap_factor*2)*but_width//4),
-               top_start, but_width-but_height, but_height, "Randomized Prim's"),
-    ]
-    top_start = top_start + (1.3*(3*but_height//2)) + ht//10
-    but_height = ht//15
-    but_width = delta//10
-    options = [
-        button(width+delta//5, top_start-35, but_width -
-               but_height+20, but_height, "Clear"),
-        button(width+delta//5 + 40 + delta//5 + (4*(but_width+50)//3),
-               top_start-35, 0, but_height, "-"),
-        button(width+delta//5 + 50 + delta//5 + (4*(but_width+50)//3) +
-               (4*(but_width-30)//3), top_start-35, 0, but_height, "+"),
-    ]
-    sc_start = ht-240
-    sc_height = 230
-    sc_width = delta-delta//4
-    output = screen(width+delta//8, sc_start, sc_width,
-                    sc_height, "Choose an Algorithm")
-    output.set_label1(f"Rows: {ROWS}")
-    output.set_text1("     1. Choose the starting node")
-    output.set_text2("    2. Choose the ending node")
-    output.set_text3("3. Choose the algorithm")
-
-    start = None
-    end = None
-
-    run = True
-    started = False
-    visited = []
-    weighted = []
-    path = False
-    while run:
-        if len(visited):
-            visit_animation(visited)
-
-        if path:
-            path_animation(path)
-
-        draw(win, grid, ROWS, width, algorithms, mazes, options, output)
+# Main menu loop
+def main_menu():
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
+                sys.exit()
 
-            if started:
-                continue
+        window.fill(WHITE)  # Clear screen with white color
 
-            if pygame.mouse.get_pressed()[0]:
-                pos = pygame.mouse.get_pos()
-                row, col = get_clicked_pos(pos, ROWS, width)
-                if row >= 0 and row < ROWS and col < ROWS and col >= 0:
-                    node = grid[row][col]
-                    if node in visited:
-                        visited.remove(node)
-                    if node in weighted:
-                        weighted.remove(node)
-                    if path:
-                        if node in path:
-                            path.remove(node)
-                    if not start and node != end:
-                        if node in visited:
-                            visited.remove(node)
-                        start = node
-                        start.make_start()
-                    elif not end and node != start:
-                        end = node
-                        end.make_end()
-                    elif node != end and node != start:
-                        node.make_barrier()
+        # Create buttons
+        button("Pathfinding", 2*BUTTON_WIDTH, WINDOW_HEIGHT - WINDOW_HEIGHT, BUTTON_WIDTH, WINDOW_HEIGHT//2,
+               INACTIVE_BUTTON_COLOR, ACTIVE_BUTTON_COLOR, start_pathfinding_visualizer)
+        
+        button("Sorting", 2*BUTTON_WIDTH, WINDOW_HEIGHT - WINDOW_HEIGHT//2, BUTTON_WIDTH, WINDOW_HEIGHT//2,
+               INACTIVE_BUTTON_COLOR, ACTIVE_BUTTON_COLOR, start_sorting_visualizer)
+        
+        pygame.display.update()
 
-                elif algorithms[0].is_hover(pos):
-                    algorithms[0].toggle_color()
-                    output.draw(win, (0, 0, 0))
-                    if len(weighted):
-                        for node in weighted:
-                            node.mark_weight()
-                    if start and end:
-                        for row in grid:
-                            for node in row:
-                                node.update_neighbors(grid)
-                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
-                                    node.reset()
-                        visited = []
-                        path = []
-                        output.set_text1("......")
-                        output.set_text2("")
-                        output.set_text3("")
-                        output.draw(win, BLACK)
-                        pygame.display.update()
-                        visited, path = maze_bfs(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
-                        if not path:
-                            output.set_text1("Path not available")
-                        algorithms[0].toggle_color()
-
-                elif algorithms[1].is_hover(pos):
-                    algorithms[1].toggle_color()
-                    if len(weighted):
-                        for node in weighted:
-                            node.mark_weight()
-                    if start and end:
-                        for row in grid:
-                            for node in row:
-                                node.update_neighbors(grid)
-                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
-                                    node.reset()
-                        visited = []
-                        path = []
-                        output.set_text1("......")
-                        output.set_text2("")
-                        output.set_text3("")
-                        output.draw(win, BLACK)
-                        pygame.display.update()
-                        visited, path = maze_dfs(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
-                        if not path:
-                            output.set_text1("Path not available")
-                        algorithms[1].toggle_color()
-
-                elif algorithms[2].is_hover(pos):
-                    algorithms[2].toggle_color()
-                    if len(weighted):
-                        for node in weighted:
-                            node.mark_weight()
-                    if start and end:
-                        for row in grid:
-                            for node in row:
-                                node.update_neighbors(grid)
-                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
-                                    node.reset()
-                        visited = []
-                        path = []
-                        output.set_text1("......")
-                        output.set_text2("")
-                        output.set_text3("")
-                        output.draw(win, BLACK)
-                        pygame.display.update()
-                        visited, path = maze_bi_bfs(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
-                        if not path:
-                            output.set_text1("Path not available")
-                        algorithms[2].toggle_color()
-
-                elif algorithms[3].is_hover(pos):
-                    algorithms[3].toggle_color()
-                    if len(weighted):
-                        for node in weighted:
-                            node.mark_weight()
-                    if start and end:
-                        for row in grid:
-                            for node in row:
-                                node.update_neighbors(grid)
-                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
-                                    node.reset()
-                        visited = []
-                        path = []
-                        output.set_text1("......")
-                        output.set_text2("")
-                        output.set_text3("")
-                        output.draw(win, BLACK)
-                        pygame.display.update()
-                        visited, path = maze_astar(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
-                        if not path:
-                            output.set_text1("Path not available")
-                        algorithms[3].toggle_color()
-
-                elif algorithms[4].is_hover(pos):
-                    algorithms[4].toggle_color()
-                    if len(weighted):
-                        for node in weighted:
-                            node.mark_weight()
-                    if start and end:
-                        for row in grid:
-                            for node in row:
-                                node.update_neighbors(grid)
-                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
-                                    node.reset()
-                        visited = []
-                        path = []
-                        output.set_text1("......")
-                        output.set_text2("")
-                        output.set_text3("")
-                        output.draw(win, BLACK)
-                        pygame.display.update()
-                        visited, path = maze_idastar(lambda: draw(win, grid, ROWS, width, algorithms, mazes, options, output),
-                                                 win, width, output, grid, start, end, theme_type, h_score(start.get_pos(), end.get_pos()))
-                        if not path:
-                            output.set_text1("Path not available")
-                        algorithms[4].toggle_color()
-
-                elif algorithms[5].is_hover(pos):
-                    algorithms[5].toggle_color()
-                    if len(weighted):
-                        for node in weighted:
-                            node.mark_weight()
-                    if start and end:
-                        for row in grid:
-                            for node in row:
-                                node.update_neighbors(grid)
-                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
-                                    node.reset()
-                        visited = []
-                        path = []
-                        output.set_text1("......")
-                        output.set_text2("")
-                        output.set_text3("")
-                        output.draw(win, BLACK)
-                        pygame.display.update()
-                        visited, path = maze_bi_bfs(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
-                        if not path:
-                            output.set_text1("Path not available")
-                        algorithms[5].toggle_color()
-
-                elif algorithms[6].is_hover(pos):
-                    algorithms[6].toggle_color()
-                    if len(weighted):
-                        for node in weighted:
-                            node.mark_weight()
-                    if start and end:
-                        for row in grid:
-                            for node in row:
-                                node.update_neighbors(grid)
-                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
-                                    node.reset()
-                        visited = []
-                        path = []
-                        output.set_text1("......")
-                        output.set_text2("")
-                        output.set_text3("")
-                        output.draw(win, BLACK)
-                        pygame.display.update()
-                        visited, path = maze_dijkstra(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
-                        if not path:
-                            output.set_text1("Path not available")
-                        algorithms[6].toggle_color()
-
-                elif mazes[0].is_hover(pos):
-                    output.set_text1("......")
-                    output.set_text2("")
-                    output.set_text3("")
-                    output.draw(win, BLACK)
-                    pygame.display.update()
-                    start = None
-                    end = None
-                    visited = []
-                    path = []
-                    weighted = []
-                    for row in grid:
-                        for node in row:
-                            if node.is_barrier() or node.is_start() or node.is_end():
-                                node.reset()
-                    maze_gen_dfs(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
-                             options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
-
-                elif mazes[1].is_hover(pos):
-                    output.set_text1("......")
-                    output.set_text2("")
-                    output.set_text3("")
-                    output.draw(win, BLACK)
-                    pygame.display.update()
-                    start = None
-                    end = None
-                    visited = []
-                    path = []
-                    weighted = []
-                    for row in grid:
-                        for node in row:
-                            if node.is_barrier() or node.is_start() or node.is_end():
-                                node.reset()
-                    maze_gen_random(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
-                                options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
-
-                elif options[0].is_hover(pos):
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
-                    output.draw(win, BLACK)
-                    pygame.display.update()
-                    weighted = []
-                    start = None
-                    end = None
-                    visited = []
-                    path = []
-                    weighted = []
-                    for row in grid:
-                        for node in row:
-                            node.reset()
-
-                elif options[1].is_hover(pos):
-                    weighted = []
-                    start = None
-                    end = None
-                    visited = []
-                    path = []
-                    weighted = []
-                    for row in grid:
-                        for node in row:
-                            node.reset()
-                    if ROWS > 5:
-                        ROWS -= 1
-                        grid = make_grid(ROWS, width)
-                    output.set_label1(f"Number of rows: {ROWS}")
-
-                elif options[2].is_hover(pos):
-                    weighted = []
-                    start = None
-                    end = None
-                    visited = []
-                    path = []
-                    weighted = []
-                    for row in grid:
-                        for node in row:
-                            node.reset()
-                    if ROWS < 100:
-                        ROWS += 1
-                        grid = make_grid(ROWS, width)
-                    output.set_label1(f"Number of rows: {ROWS}")
-
-            elif pygame.mouse.get_pressed()[2]:
-                pos = pygame.mouse.get_pos()
-                row, col = get_clicked_pos(pos, ROWS, width)
-                if row >= 0 and row < ROWS and col < ROWS and col >= 0:
-                    node = grid[row][col]
-                    if path:
-                        if node in path:
-                            path.remove(node)
-                    if node in visited:
-                        visited.remove(node)
-                    if node in weighted:
-                        weighted.remove(node)
-                    node.reset()
-                    if node == start:
-                        start = None
-                    elif node == end:
-                        end = None
-
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    run = False
-
-    pygame.quit()
-
-
-pygame.init()
-WIDTH = 800
-WIN = pygame.display.set_mode((WIDTH+700, WIDTH))
-
-pygame.display.set_caption("Path finding Visualizer")
-main(WIN, WIDTH)
+# Run the main menu loop
+main_menu()

@@ -1,4 +1,4 @@
-from sort import *
+from sort_main import *
 from themes.colors import *
 MIN_MERGE = 32
 
@@ -51,15 +51,18 @@ def insertion_sort(draw_info,arr,low,high,ascending=True):
     return arr
 
 def merge(draw_info,arr, l, m, r): 
-    len1, len2 = m - l + 1, r - m
+    len1 = m - l + 1
+    len2 = r - m
+    
     left, right = [], [] 
+    
     for i in range(0, len1): 
         left.append(arr[l + i])
          
     for i in range(0, len2):
-        right.append(arr[m + i + 1])
+        right.append(arr[m+i+1])
     
-    i, j, k = 0, 0, l 
+    i, j, k = 0, 0, l
 
     while i < len1 and j < len2: 
         if left[i] <= right[j]: 
@@ -120,7 +123,7 @@ def quick_sort(draw_info, arr, low, high, ascending=True):
             yield from quick_sort(draw_info, arr, pivot_idx+1, high)
     return arr
 
-def counting_sort(draw_info,arr, low, high, ascending=True, place=None):
+def counting_sort(draw_info,arr, low, high, ascending=True):
     max_val = max(arr)
     freq_arr = [0] * (max_val+1)
     
@@ -142,12 +145,37 @@ def counting_sort(draw_info,arr, low, high, ascending=True, place=None):
         yield True
     
     return output_array
-        
+       
+def radix_count_sort(draw_info,arr,place,ascending=True):
+    n = len(arr) 
+    output_arr = [0] * (n) 
+    count = [0] * (10) 
+   
+    for i in range(0, n): 
+        index = (arr[i]/place) 
+        count[int((index)%10)] += 1
+   
+    for i in range(1,10): 
+        count[i] += count[i-1] 
+   
+    i = n-1
+    while i>=0: 
+        index = (arr[i]/place) 
+        output_arr[ count[ int((index)%10) ] - 1] = arr[i] 
+        count[int((index)%10)] -= 1
+        i -= 1
+   
+    i = 0
+    for i in range(0,len(arr)): 
+        arr[i] = output_arr[i]
+        draw_list(draw_info, {i: 'green'}, clear_bg=True)
+        yield True 
+ 
 def radix_sort(draw_info,arr, low, high, ascending=True):
     max_ele = max(arr)
     place = 1
     while max_ele // place > 0:
-        yield from counting_sort(draw_info,arr, low, high, place=place)
+        yield from radix_count_sort(draw_info,arr,place)
         place *= 10
     
 def bucket_sort(draw_info,arr, low, high, ascending=True):

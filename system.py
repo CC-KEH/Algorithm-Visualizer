@@ -42,9 +42,33 @@ class button():
         else:
             self.color = BUTTON_COLOR
 
+class SliderBar:
+    def __init__(self, x: int, y: int, width: int, height: int, min_value: int = 0, max_value: int = 100, initial_value: int = 0):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.min_value = min_value
+        self.max_value = max_value
+        self.value = initial_value
+
+    def draw(self, screen, color):
+        # Draw background bar
+        pygame.draw.rect(screen, (150, 150, 150), (self.x, self.y, self.width, self.height))
+        
+        # Draw slider thumb
+        slider_x = int((self.value - self.min_value) / (self.max_value - self.min_value) * (self.width - 10)) + self.x
+        pygame.draw.rect(screen, color, (slider_x, self.y, 10, self.height))
+
+    def update(self, mouse_x: int):
+        # Update slider value based on mouse position
+        normalized_mouse_x = min(max(mouse_x, self.x), self.x + self.width)
+        self.value = int(((normalized_mouse_x - self.x) / self.width) * (self.max_value - self.min_value) + self.min_value)
+
+
 class screen():
-    def __init__(self, x,y,width,height, text=''):
-        self.color = SCREEN_COLOR
+    def __init__(self, x,y,width,height,text='',color=SCREEN_COLOR):
+        self.color = color
         self.x = x
         self.y = y
         self.width = width
@@ -89,7 +113,7 @@ class screen():
         if self.text3 != '':
             font = pygame.font.SysFont('verdana', 30)
             text = font.render(self.text3, 1, (0,0,0))
-            win.blit(text, (self.x + (self.width/2 - text.get_width()/2), 50 + self.y + (self.height/2 - text.get_height()/2)))
+            win.blit(text, (self.x + (self.width/2 - text.get_width()/2) - 50 , 50 + self.y + (self.height/2 - text.get_height()/2)))
 
     def is_hover(self, pos):
         #Pos is the mouse position or a tuple of (x,y) coordinates
