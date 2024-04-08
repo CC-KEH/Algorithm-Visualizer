@@ -3,7 +3,7 @@ import pygame
 import sys
 import maze_main
 import sort_main
-from themes.colors import DARK_GREEN, TEAL
+from themes.colors import DARK_GREEN, DARK_TEAL, TEAL
 
 # Initialize Pygame
 pygame.init()
@@ -15,7 +15,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (150, 150, 150)
 INACTIVE_BUTTON_COLOR = TEAL
-ACTIVE_BUTTON_COLOR = (3, 55, 61)
+ACTIVE_BUTTON_COLOR = DARK_TEAL
 FONT_SIZE = 48
 BUTTON_WIDTH = 500
 BUTTON_HEIGHT = 300
@@ -61,9 +61,7 @@ def start_pathfinding_visualizer():
 # Function to start the sorting visualizer
 def start_sorting_visualizer():
     print("Starting Sorting Visualizer")
-    width = WIDTH
-    win = pygame.display.set_mode((WIDTH+700, WIDTH))
-    sort_main.main(win,width)
+    sort_main.main(pygame.display.set_mode((800+700, 800)))
 
 # Function to quit the game
 def quit_game():

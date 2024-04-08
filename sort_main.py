@@ -1,8 +1,10 @@
+from itertools import count
 import math
 import pygame
 import random
 from system import button,screen
 from themes.colors import *
+from themes.themes import *
 from sort_algos import *
 pygame.init()
 
@@ -30,37 +32,37 @@ class DrawInformation:
         self.bar_height = math.floor((self.height - TOP_PADDING) / (list_range))
         self.start_x = SIDE_PADDING // 2
 
-def draw(draw_info, algorithms, options, output, menu=True):
-    draw_info.window.fill(BACKGROUND_COLOR)
+def draw(draw_info, algorithms, options, output,theme_type, menu=True):
+    draw_info.window.fill(themes[theme_type]['plane_color'])
     
     # Draw sorting visualizer
     draw_list(draw_info)
     
     if menu:
         # Fill menu portion with black color
-        pygame.draw.rect(draw_info.window, BLACK, (draw_info.width, 0, draw_info.window.get_width() - draw_info.width, draw_info.window.get_height()))
+        pygame.draw.rect(draw_info.window, themes[theme_type]["menu_bg_color"], (draw_info.width + 53, 0, draw_info.window.get_width() - draw_info.width, draw_info.window.get_height()))
 
         font = pygame.font.SysFont('verdana', 35)
-        text = font.render("Algorithms", 1, WHITE)
+        text = font.render("Sorting Algorithms", 1, WHITE)
         top = 0
         ht = 900
         delta = 700
         end = ht//40
-        win.blit(text, ((width+delta//2.1), (end-top)/2.5))
+        win.blit(text, ((width+delta//2.5), (end-top)/2.5))
         # Draw menu functions
         for algorithm in algorithms:
-            algorithm.draw(draw_info.window, BLACK)
+            algorithm.draw(draw_info.window)
         
         text = font.render("Settings", 1, WHITE)
         but_height = ht//14.5
         top += (8*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        win.blit(text, (width+delta//2, ((end-top)/2) + top))
+        win.blit(text, (width+delta//2 + 30, (end-top) + 1.1*top))
         
         for option in options:
-            option.draw(draw_info.window, BLACK)
+            option.draw(draw_info.window)
             
-        output.draw(draw_info.window, BLACK)    
+        output.draw(draw_info.window)    
     pygame.display.update()
 
 
@@ -85,97 +87,93 @@ def draw_list(draw_info,color_positions={},clear_bg=False):
         pygame.display.update()
 
 
-def generate_list(n, min_val, max_val):
+def generate_list(n, min_val, max_val,uniform=False):
     lst = []
     for _ in range(n):
-        lst.append(random.randint(min_val, max_val))
-
+        val = random.randint(min_val, max_val) if not uniform else random.uniform(0, 1)
+        lst.append(val)
     return lst
 
 
 def main(window):
+    theme_type = 'Default'
     w, ht = pygame.display.get_surface().get_size()
     width = ht #Sort Display
     delta = w - width
-
+    
     n = 50
     min_val = 0
     max_val = 100
     
-    #* Algorithms Panel 
-    top_start = ht/10
+    top_start = ht/30
     but_height = ht//15
-    but_width = delta//4
-    gap_factor = 5  # * Determines the gap between the buttons
-    # * Determines the coordinate from where the button start in x-axis.
-    start_factor = 2.7
-    algorithms = [
-        button(width+delta//start_factor, top_start,
-               but_width-but_height, but_height, 'Bubble Sort'),
-
-        button(width+delta//start_factor, top_start + (3*but_height//2),
-               but_width-but_height, but_height, 'Selection Sort'),
-        
-        button(width+delta//start_factor, top_start + (6*but_height//2),
-               but_width-but_height, but_height, 'Insertion Sort'),
-        
-        button(width+delta//start_factor, top_start + (9*but_height//2),
-               but_width-but_height, but_height, 'Tim Sort'),
-
-        button(width+delta//start_factor + (gap_factor*but_width//4),
-               top_start, but_width-but_height, but_height, "Merge Sort"),
-
-        button(width+delta//start_factor + (gap_factor*but_width//4), top_start +
-               (3*but_height//2), but_width-but_height, but_height, 'Quick Sort'),
-
-        button(width+delta//start_factor + (gap_factor*but_width//4), top_start +
-               (6*but_height//2), but_width-but_height, but_height, 'Radix Sort'),
-
-        button(width+delta//start_factor + (gap_factor*but_width//4), top_start +
-               (9*but_height//2), but_width-but_height, but_height, 'Bucket Sort'),
-    ]
-
-    top_start = top_start + (1.9*(3*but_height//2)) + but_height + ht//10
-    but_height = ht//15
-    but_width = delta//4
+    but_width = delta//2.2
+    horizontal_gap_factor = but_width-but_height  
+    vertical_gap_factor = but_height
     
-    #* Options Panel
-    top_start = top_start + (1.3*(3*but_height//2)) + ht//10
-    but_height = ht//15
-    but_width = delta//10
+    algorithms = [
+        button(width+delta//4 +30, top_start + vertical_gap_factor,
+               but_width-but_height-20, but_height, 'Bubble Sort'),
+    
+        button(width+delta//4+ 30, top_start + (2*vertical_gap_factor),
+               but_width-but_height-20, but_height, 'Selection Sort'),
+    
+        button(width+delta//4+ 30, top_start + (3*vertical_gap_factor),
+               but_width-but_height-20, but_height, 'Insertion Sort'),
+        
+        button(width+delta//4+ 30, top_start + (4*vertical_gap_factor), 
+               but_width-but_height-20, but_height, 'Tim Sort'),
+        
+        button((width+delta//4 + horizontal_gap_factor+12),
+               top_start + vertical_gap_factor, but_width-but_height-20, but_height, "Merge Sort"),
+
+        button((width+delta//4 + horizontal_gap_factor+12), top_start +
+                (2*vertical_gap_factor), but_width-but_height-20, but_height, 'Quick Sort'),
+
+        button((width+delta//4 + horizontal_gap_factor+12), top_start +
+               (3*vertical_gap_factor), but_width-but_height-20, but_height, 'Radix Sort'),
+   
+        button((width+delta//4 + horizontal_gap_factor+12), top_start +
+               (4*vertical_gap_factor), but_width-but_height-20, but_height, 'Bucket Sort'),
+    ]
+    options_fst_hf_wdt = (but_width-but_height)//2
+    options_sec_hf_st = (width+delta//4 + 30 + horizontal_gap_factor-20)
+    options_sec_hf_wdt = (but_width-but_height-20)//3 + 1
+    options_start_top = top_start + (8*vertical_gap_factor) + 2
     options = [
-        button(width+delta//3, top_start-60, but_width - but_height+50, but_height, "Generate"),
-        button(width+delta//3 + 130, top_start-60, but_width - but_height+20, but_height, "Slow"),
-        button(width+delta//3 + 230, top_start-60, but_width - but_height+20, but_height, "Fast"),
-        button(width+delta//3 + 330, top_start-60, 0, but_height, "-"),
-        button(width+delta//3 + 390, top_start-60, 0, but_height, "+"),
+        button(width+delta//4 + 30, options_start_top, options_fst_hf_wdt, but_height, "Generate"),
+        button(width+delta//4 + 30 +options_fst_hf_wdt,  options_start_top,   options_fst_hf_wdt, but_height, "Slow"),
+        button(options_sec_hf_st, options_start_top, options_sec_hf_wdt, but_height, "Fast"),
+        button(options_sec_hf_st + options_sec_hf_wdt, options_start_top, options_sec_hf_wdt, but_height, "-"),
+        button(options_sec_hf_st + options_sec_hf_wdt*2, options_start_top, options_sec_hf_wdt, but_height, "+"),
+        button(width+delta//4 + 30, options_start_top + but_height+1, (but_width-but_height-20), but_height, "Reverse Order"),
+        button(options_sec_hf_st, options_start_top + but_height+1, (but_width-but_height-19), but_height, "Uniform Array"),
     ]
     #* Result Screen
-    sc_start = ht-240
-    sc_height = 230
-    sc_width = delta-delta//3.5
-    output = screen(width+delta//4, sc_start, sc_width,
-                    sc_height, "Choose an Algorithm")
-    output.set_label1(f"Range: {n}")
-    output.set_text1("1. + To Increase List Size by 5")
-    output.set_text2("2. - To Decrease List Size by 5")
-    output.set_text3("3. Choose the algorithm")
-
-    run = True
-    clock = pygame.time.Clock()
-    lst = generate_list(n, min_val, max_val)
+    sc_y_start = ht-240
+    sc_x_start = width+delta//4 + 28
+    sc_height = 250
+    sc_width = (but_width-but_height-17)*2
+    lst = generate_list(n, min_val, max_val,uniform=False)
     
     draw_info = DrawInformation(width + 150, width, lst, window)
-    
     sorting = False
     ascending = True
     sorting_algorithm = bubble_sort
-    sorting_algorithm_name = "Bubble Sort"
+    sorting_algorithm_name = ""
     sorting_algorithm_generator = None
+    
+    output = screen(sc_x_start, sc_y_start, sc_width, sc_height, "Choose an Algorithm")
+    output.set_label1(f"Range: {n}")
+    output.set_text1(f"{sorting_algorithm_name}")
+
+    run = True
+    clock = pygame.time.Clock()
     low = 0
     high = len(draw_info.lst)
+    speed = 60
     while run:
-        clock.tick(60)
+        clock.tick(speed)
         if sorting:
             try:
                 next(sorting_algorithm_generator)
@@ -183,83 +181,118 @@ def main(window):
             except StopIteration:
                 sorting = False
         else:
-            draw(draw_info, algorithms, options, output)
+            draw(draw_info, algorithms, options, output,theme_type)
             
-        draw(draw_info,algorithms,options,output)        
+        draw(draw_info,algorithms,options,output,theme_type)        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type != pygame.KEYDOWN:
-                continue
-            if event.key == pygame.K_r:
-                lst = generate_list(n, min_val, max_val)
-                draw_info.set_list(lst)
-                sorting = False
+
+            if event.type == pygame.KEYDOWN:        
+                if event.key == pygame.K_r:
+                    lst = generate_list(n, min_val, max_val)
+                    draw_info.set_list(lst)
+                    sorting = False         
+                
+                elif event.key == pygame.K_o and not sorting:
+                    ascending = not ascending
+                
+                elif event.key == pygame.K_SPACE and not sorting:
+                    if sorting_algorithm_generator == None:
+                        sorting_algorithm = bubble_sort
+                    sorting = True
+                    print(ascending)
+                    sorting_algorithm_generator = sorting_algorithm(draw_info,draw_info.lst,low,high,ascending)
+
+            
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
+                if algorithms[0].is_hover(pos):
+                    algorithms[0].toggle_color()
+                    output.draw(win, (0, 0, 0))
+                    sorting_algorithm = bubble_sort
+                    sorting_algorithm_name = 'Bubble Sort'
+                    
+                elif algorithms[1].is_hover(pos):
+                    algorithms[1].toggle_color()
+                    output.draw(win, (0, 0, 0))
+                    sorting_algorithm = selection_sort
+                    sorting_algorithm_name = 'Selection Sort'
+                
+                elif algorithms[2].is_hover(pos):
+                    algorithms[2].toggle_color()
+                    output.draw(win, (0, 0, 0))
+                    sorting_algorithm = insertion_sort
+                    sorting_algorithm_name = 'Insertion Sort'
 
-                if algorithms[0].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
+                elif algorithms[3].is_hover(pos):
+                    algorithms[3].toggle_color()
                     output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = bubble_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
+                    sorting_algorithm = tim_sort
+                    sorting_algorithm_name = 'Tim Sort'
+
+                elif algorithms[4].is_hover(pos):
+                    algorithms[4].toggle_color()
+                    output.draw(win, (0, 0, 0))
+                    sorting_algorithm = merge_sort
+                    sorting_algorithm_name = 'Merge Sort'
                 
-                elif algorithms[1].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
+                elif algorithms[5].is_hover(pos):
+                    algorithms[5].toggle_color()
                     output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = selection_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
+                    sorting_algorithm = quick_sort
+                    sorting_algorithm_name = 'Quick Sort'
                 
-                elif algorithms[2].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
+                elif algorithms[6].is_hover(pos):
+                    algorithms[6].toggle_color()
                     output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = insertion_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
+                    sorting_algorithm = radix_sort
+                    sorting_algorithm_name = 'Radix Sort'
                 
-                elif algorithms[3].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
+                elif algorithms[7].is_hover(pos):
+                    algorithms[7].toggle_color()
                     output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = tim_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
+                    sorting_algorithm = bucket_sort
+                    sorting_algorithm_name = 'Bucket Sort'
                 
-                elif algorithms[4].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
-                    output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = merge_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
+                elif options[0].is_hover(pos):
+                    options[0].toggle_color()
+                    lst = generate_list(n, min_val, max_val)
+                    draw_info.set_list(lst)
+                    sorting = False   
+                                     
+                elif options[1].is_hover(pos):
+                    options[1].toggle_color()
+                    if speed>=20:
+                        speed-=10
                 
-                elif algorithms[5].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
-                    output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = quick_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
+                elif options[2].is_hover(pos):
+                    options[2].toggle_color()
+                    if speed<=90:
+                        speed+=10
                 
-                elif algorithms[6].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
-                    output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = radix_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
+                elif options[3].is_hover(pos):
+                    options[3].toggle_color()
+                    if n>=20:
+                        n-=10
                 
-                elif algorithms[7].is_hover(pos) and not sorting:
-                    algorithms[0].toggle_color()
-                    output.draw(win, (0, 0, 0))
-                    sorting = True
-                    sorting_algorithm_generator = bucket_sort(draw_info,draw_info.lst,low,high,ascending=True)
-                    algorithms[0].toggle_color()
-                        
-            elif event.key == pygame.K_SPACE and not sorting:
-                sorting = True
-                sorting_algorithm_generator = sorting_algorithm(draw_info,draw_info.lst,low,high,ascending)
-            
-            elif event.key == pygame.K_o and not sorting:
-                ascending = not ascending
+                elif options[4].is_hover(pos):
+                    options[4].toggle_color()
+                    if n<100:
+                        n+=10
+                
+                elif options[5].is_hover(pos):
+                    options[5].toggle_color()
+                    ascending = not ascending
+                
+                elif options[6].is_hover(pos):
+                    options[6].toggle_color()
+                    lst = generate_list(n, min_val, max_val,uniform=True)
+                    draw_info.set_list(lst)
+                    sorting = False   
+                                     
+                
+                
 
     pygame.quit()
 

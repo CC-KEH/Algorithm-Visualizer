@@ -2,6 +2,11 @@ from themes.colors import *
 
 themes = {
     "Default": {
+        "menu_bg_color":TEAL,
+        "inactive_button_color":TEAL,
+        "active_button_color":CYAN,
+        "button_outline_color":TURQUOISE,
+        "button_text_color":WHITE,
         "start_color": MAGENTA,
         "end_color": RED,
         "barrier_color": BLACK,

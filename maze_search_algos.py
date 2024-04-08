@@ -5,7 +5,7 @@ from themes.animations import *
 from utils import *
 from grid import *
 
-def reconstruct_path(came_from, start, current, draw, visited,  win, width, grid,theme_type, is_draw = True): 
+def reconstruct_path(came_from, start, current, draw, visited,  win, width,theme_type, grid,is_draw = True): 
     path = []
     c = 0
     while current in came_from:
@@ -95,8 +95,7 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
 
         current = stack.pop()
         if current == end:
-            path, inc = reconstruct_path(
-                came_from, start, end, draw, visited, win, width, theme_type,grid)
+            path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
             start.make_start()
             output.set_text1(f"Path Length: {inc}")
             output.set_text2(f"#Visited nodes: {vis}")
@@ -115,8 +114,7 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
                     stack.append(neighbor)
                     neighbor.make_open()
                     if (neighbor == end):
-                        path, inc = reconstruct_path(
-                            came_from, start, end, draw, visited, win, width, theme_type,grid)
+                        path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
                         start = start.make_start()
                         output.set_text1(f"Path Length: {inc}")
                         output.set_text2(f"#Visited nodes: {vis}")
@@ -129,7 +127,7 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
             vis += c
             current.make_visit()
 
-        visit_animation(visited)
+        visit_animation(visited,themes)
 
         for rows in grid:
             for node in rows:
@@ -165,7 +163,7 @@ def maze_dijkstra(draw, grid, start, end, output, win, width,theme_type):
                 output.set_text3(
                     f"Efficiency: {np.round(inc / len(visited_list), decimals=3)}")
             # Send visited_list to visit_animation
-            visit_animation(visited_list)
+            visit_animation(visited_list,theme_type)
             return visited_list, path
 
         if current_node in visited_list:
@@ -265,7 +263,7 @@ def maze_astar(draw, grid, start, end, output, win, width,theme_type):
             
     return False
 
-def maze_idastar(draw, win, width, output,  grid, start, end,theme_type, threshold=100, moving_target= False, visited_old = []):
+def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold=100, moving_target= False, visited_old = []):
     if threshold < len(grid)**2:
         count = 0
         vis = 0

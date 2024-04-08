@@ -15,62 +15,59 @@ def main(win, width):
     grid = make_grid(ROWS, width)
     delta = w - width
 
-    top_start = ht/13
+    top_start = ht/30
     but_height = ht//15
-    but_width = delta//4
-    gap_factor = 5  # * Determines the gap between the buttons
-    # * Determines the coordinate from where the button start in x-axis.
-    start_factor = 10
+    but_width = delta//1.7
+    horizontal_gap_factor = but_width-but_height  
+    vertical_gap_factor = but_height
+    start_factor = 3
 
     algorithms = [
-        button(width+delta//start_factor, top_start,
+        button(width + start_factor, top_start + vertical_gap_factor,
                but_width-but_height, but_height, 'BFS'),
-
-        button(width+delta//start_factor, top_start + (6*but_height//2),
-               but_width-but_height, but_height, 'DFS'),
-
-        button(width+delta//start_factor, top_start + (3*but_height//2),
+    
+        button(width + start_factor, top_start + (2*vertical_gap_factor),
                but_width-but_height, but_height, 'Bi-BFS'),
+    
+        button(width + start_factor, top_start + (3*vertical_gap_factor),
+               but_width-but_height, but_height, 'DFS'),
+        
+        button(width + start_factor, top_start + (4*vertical_gap_factor), 
+               but_width-but_height, but_height, 'Dijkstra'),
+        
+        button(width + start_factor + horizontal_gap_factor,
+               top_start + vertical_gap_factor, but_width-but_height, but_height, "A*"),
 
-        button(width+delta//start_factor + (gap_factor*but_width//4),
-               top_start, but_width-but_height, but_height, "A*"),
+        button(width + start_factor + horizontal_gap_factor, top_start +
+                (2*vertical_gap_factor), but_width-but_height, but_height, 'IDA*'),
 
-        button(width+delta//start_factor + (gap_factor*but_width//4), top_start +
-               (3*but_height//2), but_width-but_height, but_height, 'IDA*'),
-
-        button(width+delta//start_factor + (gap_factor*but_width//4), top_start +
-               (6*but_height//2), but_width-but_height, but_height, 'Bi-A*'),
-
-        button(width+delta//start_factor + ((gap_factor * 2)*but_width//4),
-               top_start, but_width-but_height, but_height, 'Dijkstra'),
+        button(width + start_factor + horizontal_gap_factor, top_start +
+               (3*vertical_gap_factor), but_width-but_height, but_height, 'Bi-A*'),
+   
+        button(width + start_factor + horizontal_gap_factor, top_start +
+               (4*vertical_gap_factor), but_width-but_height, but_height, 'BellmanFord'),
     ]
 
-    top_start = top_start + (1.9*(3*but_height//2)) + but_height + ht//10
-    but_height = ht//15
-    but_width = delta//4
     mazes = [
-        button(width+delta//start_factor, top_start,
-               but_width-but_height, but_height, "DFS Maze"),
+        button(width + start_factor, top_start + (6*vertical_gap_factor), but_width-but_height, but_height, "DFS Maze"),
 
-        button(width+delta//start_factor + (gap_factor*but_width//4),
-               top_start, but_width-but_height, but_height, "Random"),
+        button(width + start_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "Random"),
 
-        button(width+delta//start_factor + ((gap_factor*2)*but_width//4),
-               top_start, but_width-but_height, but_height, "Kruskal"),
+        button(width + start_factor + horizontal_gap_factor, top_start + (6*vertical_gap_factor), but_width-but_height, but_height, "Kruskal"),
 
-        button(width+delta//start_factor + ((gap_factor*2)*but_width//4),
-               top_start, but_width-but_height, but_height, "Randomized Prim's"),
+        button(width + start_factor + horizontal_gap_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "Prim's"),
     ]
-    top_start = top_start + (1.3*(3*but_height//2)) + ht//10
-    but_height = ht//15
-    but_width = delta//10
+    but_width = but_width//1.4
+    horizontal_gap_factor = but_width-but_height
     options = [
-        button(width+delta//5, top_start-35, but_width -
-               but_height+20, but_height, "Clear"),
-        button(width+delta//5 + 40 + delta//5 + (4*(but_width+50)//3),
-               top_start-35, 0, but_height, "-"),
-        button(width+delta//5 + 50 + delta//5 + (4*(but_width+50)//3) +
-               (4*(but_width-30)//3), top_start-35, 0, but_height, "+"),
+        button(width + start_factor, top_start +
+               (9*vertical_gap_factor), but_width-but_height, but_height, "Clear"),
+        
+        button(width + start_factor + horizontal_gap_factor, top_start +
+               (9*vertical_gap_factor), but_width-but_height, but_height, "Decrease Nodes"),
+        
+        button(width + start_factor + (2*horizontal_gap_factor), top_start +
+               (9*vertical_gap_factor), but_width-but_height, but_height, "Increase Nodes"),
     ]
     sc_start = ht-240
     sc_height = 230
@@ -78,8 +75,8 @@ def main(win, width):
     output = screen(width+delta//8, sc_start, sc_width,
                     sc_height, "Choose an Algorithm")
     output.set_label1(f"Rows: {ROWS}")
-    output.set_text1("     1. Choose the starting node")
-    output.set_text2("    2. Choose the ending node")
+    output.set_text1("1. Choose the starting node")
+    output.set_text2("2. Choose the ending node")
     output.set_text3("3. Choose the algorithm")
 
     start = None
@@ -92,10 +89,10 @@ def main(win, width):
     path = False
     while run:
         if len(visited):
-            visit_animation(visited)
+            visit_animation(visited,theme_type)
 
         if path:
-            path_animation(path)
+            path_animation(path,theme_type)
 
         draw(win, grid, ROWS, width, algorithms, mazes, options, output)
         for event in pygame.event.get():
@@ -171,7 +168,7 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_dfs(lambda: draw(
+                        visited, path = maze_bi_bfs(lambda: draw(
                             win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
@@ -195,7 +192,7 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_bi_bfs(lambda: draw(
+                        visited, path = maze_dfs(lambda: draw(
                             win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
@@ -219,7 +216,7 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_astar(lambda: draw(
+                        visited, path = maze_dijkstra(lambda: draw(
                             win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
@@ -243,8 +240,8 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_idastar(lambda: draw(win, grid, ROWS, width, algorithms, mazes, options, output),
-                                                 win, width, output, grid, start, end, theme_type, h_score(start.get_pos(), end.get_pos()))
+                        visited, path = maze_astar(lambda: draw(win, grid, ROWS, width, algorithms, mazes, options, output),
+                                                 win, width, output, grid, start, end, theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[4].toggle_color()
@@ -267,7 +264,7 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_bi_bfs(lambda: draw(
+                        visited, path = maze_idastar(lambda: draw(
                             win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
@@ -291,7 +288,7 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_dijkstra(lambda: draw(
+                        visited, path = maze_bellman_ford(lambda: draw(
                             win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
@@ -334,6 +331,47 @@ def main(win, width):
                             if node.is_barrier() or node.is_start() or node.is_end():
                                 node.reset()
                     maze_gen_random(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
+                                options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
+                    output.set_text1("1. Pick starting node")
+                    output.set_text2("2. Pick ending node")
+                    output.set_text3("3. Choose an algorithm")
+                
+                elif mazes[2].is_hover(pos):
+                    output.set_text1("......")
+                    output.set_text2("")
+                    output.set_text3("")
+                    output.draw(win, BLACK)
+                    pygame.display.update()
+                    start = None
+                    end = None
+                    visited = []
+                    path = []
+                    weighted = []
+                    for row in grid:
+                        for node in row:
+                            if node.is_barrier() or node.is_start() or node.is_end():
+                                node.reset()
+                    maze_gen_kruskal(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
+                                options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
+                    output.set_text1("1. Pick starting node")
+                    output.set_text2("2. Pick ending node")
+                    output.set_text3("3. Choose an algorithm")
+                elif mazes[3].is_hover(pos):
+                    output.set_text1("......")
+                    output.set_text2("")
+                    output.set_text3("")
+                    output.draw(win, BLACK)
+                    pygame.display.update()
+                    start = None
+                    end = None
+                    visited = []
+                    path = []
+                    weighted = []
+                    for row in grid:
+                        for node in row:
+                            if node.is_barrier() or node.is_start() or node.is_end():
+                                node.reset()
+                    maze_gen_prims(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
                                 options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
                     output.set_text1("1. Pick starting node")
                     output.set_text2("2. Pick ending node")

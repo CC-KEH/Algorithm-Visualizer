@@ -2,30 +2,26 @@ import pygame
 from themes.colors import *
 from themes.animations import *
 from grid import *
-
+from themes.themes import *
 class button():
-    def __init__(self, x, y,width,height, text=''):
-        self.color = BUTTON_COLOR
+    def __init__(self, x, y,width,height, text='',theme_type='Default'):
+        self.color = themes[theme_type]["inactive_button_color"]
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.text = text
 
-    def draw(self,win,outline=None):
+    def draw(self,win,theme_type='Default',outline=True):
         #Call this method to draw the button on the screen
         if outline:
-            pygame.draw.rect(win, outline, (self.x-2,self.y-2,self.width+4,self.height+4),0)
-            pygame.draw.circle(win, outline, (self.x, self.y+self.height//2), self.height//2+2)
-            pygame.draw.circle(win, outline, (self.x+self.width, self.y+self.height//2), self.height//2+2)
-            
+            pygame.draw.rect(win, themes[theme_type]["button_outline_color"], (self.x-2,self.y-2,self.width+4,self.height+4),0)
+    
         pygame.draw.rect(win, self.color, (self.x,self.y,self.width,self.height),0)
-        pygame.draw.circle(win, self.color, (self.x, self.y+self.height//2), self.height//2)
-        pygame.draw.circle(win, self.color, (self.x+self.width, self.y+self.height//2), self.height//2)
-        
+
         if self.text != '':
             font = pygame.font.SysFont('verdana', 20)
-            text = font.render(self.text, 1, (0,0,0))
+            text = font.render(self.text, 1, (255,255,255))
             win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
 
     def is_hover(self, pos):
@@ -37,33 +33,10 @@ class button():
         return False
     
     def toggle_color(self):
-        if(self.color == BUTTON_COLOR):
-            self.color = (129, 201, 202)
+        if(self.color == themes[theme_type]["inactive_button_color"]):
+            self.color = themes[theme_type]["active_button_color"]
         else:
-            self.color = BUTTON_COLOR
-
-class SliderBar:
-    def __init__(self, x: int, y: int, width: int, height: int, min_value: int = 0, max_value: int = 100, initial_value: int = 0):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.min_value = min_value
-        self.max_value = max_value
-        self.value = initial_value
-
-    def draw(self, screen, color):
-        # Draw background bar
-        pygame.draw.rect(screen, (150, 150, 150), (self.x, self.y, self.width, self.height))
-        
-        # Draw slider thumb
-        slider_x = int((self.value - self.min_value) / (self.max_value - self.min_value) * (self.width - 10)) + self.x
-        pygame.draw.rect(screen, color, (slider_x, self.y, 10, self.height))
-
-    def update(self, mouse_x: int):
-        # Update slider value based on mouse position
-        normalized_mouse_x = min(max(mouse_x, self.x), self.x + self.width)
-        self.value = int(((normalized_mouse_x - self.x) / self.width) * (self.max_value - self.min_value) + self.min_value)
+            self.color = themes[theme_type]["inactive_button_color"]
 
 
 class screen():
@@ -126,8 +99,8 @@ class screen():
 
 
 
-def draw(win, grid, rows, width, algorithms, mazes, options, output, menu = True):
-    win.fill(BG_COLOR)
+def draw(win, grid, rows, width, algorithms, mazes, options, output,theme_type='Default', menu = True):
+    win.fill(themes[theme_type]["menu_bg_color"])
     for row in grid:
         for node in row:
             node.draw(win)
@@ -139,27 +112,27 @@ def draw(win, grid, rows, width, algorithms, mazes, options, output, menu = True
         width = ht
         w = 1600
         font = pygame.font.SysFont('verdana', 35)
-        text = font.render("Algorithms", 1, WHITE)
+        text = font.render("Path Finding Algorithms", 1, WHITE)
         top = 0
         end = ht//40
-        win.blit(text, ((width+delta//4.5), (end-top)/2.5))
+        win.blit(text, ((width+delta//12), (end-top)/2.5))
         for algorithm in algorithms:
-            algorithm.draw(win, BLACK)
+            algorithm.draw(win)
         
         text = font.render("Generate Maze", 1, WHITE)
         but_height = ht//15
-        top += (4*but_height)
+        top += (4.3*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        win.blit(text, (width+delta//6, ((end-top)/2) + top))
+        win.blit(text, (width+delta//5.1, ((end-top)/2) + top))
         for maze in mazes:
-            maze.draw(win, BLACK)
+            maze.draw(win)
             
         end += (1.3*(3*but_height//2)) + ht//6
-        top += (5*but_height//2)
+        top += (1.7*but_height//2)
         
         text = font.render("Grid Settings", 1, WHITE)
-        win.blit(text, (width+delta//6, ((end-top)/2) + top))
+        win.blit(text, (width+delta//4.8, ((end-top)/2) + top))
         for option in options:
-            option.draw(win, BLACK)
-        output.draw(win, BLACK)
+            option.draw(win)
+        output.draw(win)
     pygame.display.update()
