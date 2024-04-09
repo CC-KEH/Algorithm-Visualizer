@@ -13,10 +13,15 @@ class button():
         self.text = text
 
     def draw(self,win,theme_type='Default',outline=True):
-        #Call this method to draw the button on the screen
+        mouse_pos = pygame.mouse.get_pos()
+        if self.x < mouse_pos[0] < self.x + self.width and self.y < mouse_pos[1] < self.y + self.height:
+            self.color = themes[theme_type]["active_button_color"]
+        else:
+            self.color = themes[theme_type]["inactive_button_color"]
+        
         if outline:
             pygame.draw.rect(win, themes[theme_type]["button_outline_color"], (self.x-2,self.y-2,self.width+4,self.height+4),0)
-    
+        
         pygame.draw.rect(win, self.color, (self.x,self.y,self.width,self.height),0)
 
         if self.text != '':

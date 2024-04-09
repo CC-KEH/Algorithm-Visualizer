@@ -61,6 +61,8 @@ def start_pathfinding_visualizer():
 # Function to start the sorting visualizer
 def start_sorting_visualizer():
     print("Starting Sorting Visualizer")
+    width = WIDTH
+    pygame.display.set_mode((width+700, width))
     sort_main.main(pygame.display.set_mode((800+700, 800)))
 
 # Function to quit the game

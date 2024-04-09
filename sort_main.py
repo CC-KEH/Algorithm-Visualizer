@@ -46,9 +46,10 @@ def draw(draw_info, algorithms, options, output,theme_type, menu=True):
         text = font.render("Sorting Algorithms", 1, WHITE)
         top = 0
         ht = 900
+        width = ht
         delta = 700
         end = ht//40
-        win.blit(text, ((width+delta//2.5), (end-top)/2.5))
+        draw_info.window.blit(text, ((width+delta//2.5), (end-top)/2.5))
         # Draw menu functions
         for algorithm in algorithms:
             algorithm.draw(draw_info.window)
@@ -57,7 +58,7 @@ def draw(draw_info, algorithms, options, output,theme_type, menu=True):
         but_height = ht//14.5
         top += (8*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        win.blit(text, (width+delta//2 + 30, (end-top) + 1.1*top))
+        draw_info.window.blit(text, (width+delta//2 + 30, (end-top) + 1.1*top))
         
         for option in options:
             option.draw(draw_info.window)
