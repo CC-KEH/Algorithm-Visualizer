@@ -4,8 +4,8 @@ themes = {
     "Default": {
         "menu_bg_color":TEAL,
         "inactive_button_color":TEAL,
-        "active_button_color":CYAN,
-        "button_outline_color":TURQUOISE,
+        "active_button_color":DARK_TEAL,
+        "button_outline_color":TEAL_V2,
         "button_text_color":WHITE,
         "start_color": MAGENTA,
         "end_color": RED,

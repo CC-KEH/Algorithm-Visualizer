@@ -1,3 +1,4 @@
+from turtle import back
 import pygame
 from themes.colors import *
 from themes.animations import *
@@ -104,8 +105,9 @@ class screen():
 
 
 
-def draw(win, grid, rows, width, algorithms, mazes, options, output,theme_type='Default', menu = True):
+def draw(win, grid, rows, width, algorithms, mazes,back_icon, options, output,theme_type='Default', menu = True):
     win.fill(themes[theme_type]["menu_bg_color"])
+    back_logo = pygame.image.load('assets/back_icon.png')
     for row in grid:
         for node in row:
             node.draw(win)
@@ -120,7 +122,8 @@ def draw(win, grid, rows, width, algorithms, mazes, options, output,theme_type='
         text = font.render("Path Finding Algorithms", 1, WHITE)
         top = 0
         end = ht//40
-        win.blit(text, ((width+delta//12), (end-top)/2.5))
+        win.blit(back_logo, ((width-80), (end-top)/2.5))
+        win.blit(text, ((width+delta//10), (end-top)/2.5))
         for algorithm in algorithms:
             algorithm.draw(win)
         
@@ -128,7 +131,7 @@ def draw(win, grid, rows, width, algorithms, mazes, options, output,theme_type='
         but_height = ht//15
         top += (4.3*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        win.blit(text, (width+delta//5.1, ((end-top)/2) + top))
+        win.blit(text, (width+delta//5.5, ((end-top)/2) + top))
         for maze in mazes:
             maze.draw(win)
             
@@ -136,8 +139,18 @@ def draw(win, grid, rows, width, algorithms, mazes, options, output,theme_type='
         top += (1.7*but_height//2)
         
         text = font.render("Grid Settings", 1, WHITE)
-        win.blit(text, (width+delta//4.8, ((end-top)/2) + top))
+        win.blit(text, (width+delta//5, ((end-top)/2) + top))
         for option in options:
             option.draw(win)
         output.draw(win)
     pygame.display.update()
+
+
+def is_hover(icon,pos):
+    #Pos is the mouse position or a tuple of (x,y) coordinates
+    rect = icon.get_rect()
+    if pos[0] > rect.x - icon.get_height()//2 and pos[0] < rect.x + icon.get_width()+icon.get_height()//2:
+        if pos[1] > rect.y and pos[1] < rect.y + icon.get_height():
+            return True
+        
+    return False

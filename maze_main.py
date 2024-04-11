@@ -5,7 +5,7 @@ from themes.animations import *
 from system import *
 from maze_search_algos import *
 from maze_gen_algos import *
-
+import main
 
 def main(win, width):
     theme_type = "Default"
@@ -21,6 +21,7 @@ def main(win, width):
     horizontal_gap_factor = but_width-but_height  
     vertical_gap_factor = but_height
     start_factor = 3
+    back_icon = pygame.image.load('assets/back_icon.png')
 
     algorithms = [
         button(width + start_factor, top_start + vertical_gap_factor,
@@ -70,9 +71,9 @@ def main(win, width):
                (9*vertical_gap_factor), but_width-but_height, but_height, "Increase Nodes"),
     ]
     sc_start = ht-240
-    sc_height = 230
+    sc_height = 250
     sc_width = delta-delta//4
-    output = screen(width+delta//8, sc_start, sc_width,
+    output = screen(width+start_factor-2.1, sc_start, 700,
                     sc_height, "Choose an Algorithm")
     output.set_label1(f"Rows: {ROWS}")
     output.set_text1("1. Choose the starting node")
@@ -94,7 +95,7 @@ def main(win, width):
         if path:
             path_animation(path,theme_type)
 
-        draw(win, grid, ROWS, width, algorithms, mazes, options, output)
+        draw(win, grid, ROWS, width, algorithms, mazes,back_icon, options, output)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -124,7 +125,10 @@ def main(win, width):
                         end.make_end()
                     elif node != end and node != start:
                         node.make_barrier()
-
+                elif is_hover(back_icon,pos):
+                    print("Sending to Main Menu")
+                    main.main_menu()
+                    
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
                     output.draw(win, (0, 0, 0))
@@ -145,7 +149,7 @@ def main(win, width):
                         output.draw(win, BLACK)
                         pygame.display.update()
                         visited, path = maze_bfs(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
+                            win, grid, ROWS, width, algorithms, mazes,back_icon, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[0].toggle_color()
@@ -169,7 +173,7 @@ def main(win, width):
                         output.draw(win, BLACK)
                         pygame.display.update()
                         visited, path = maze_bi_bfs(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
+                            win, grid, ROWS, width, algorithms, mazes,back_icon, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[1].toggle_color()
@@ -193,7 +197,7 @@ def main(win, width):
                         output.draw(win, BLACK)
                         pygame.display.update()
                         visited, path = maze_dfs(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
+                            win, grid, ROWS, width, algorithms, mazes,back_icon, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[2].toggle_color()
@@ -217,7 +221,7 @@ def main(win, width):
                         output.draw(win, BLACK)
                         pygame.display.update()
                         visited, path = maze_dijkstra(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
+                            win, grid, ROWS, width, algorithms, mazes,back_icon, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[3].toggle_color()
@@ -240,7 +244,7 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_astar(lambda: draw(win, grid, ROWS, width, algorithms, mazes, options, output),
+                        visited, path = maze_astar(lambda: draw(win, grid, ROWS, width, algorithms, mazes,back_icon, options, output),
                                                  win, width, output, grid, start, end, theme_type)
                         if not path:
                             output.set_text1("Path not available")
@@ -265,7 +269,7 @@ def main(win, width):
                         output.draw(win, BLACK)
                         pygame.display.update()
                         visited, path = maze_idastar(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
+                            win, grid, ROWS, width, algorithms, mazes,back_icon, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[5].toggle_color()
@@ -289,7 +293,7 @@ def main(win, width):
                         output.draw(win, BLACK)
                         pygame.display.update()
                         visited, path = maze_bellman_ford(lambda: draw(
-                            win, grid, ROWS, width, algorithms, mazes, options, output), grid, start, end, output, win, width,theme_type)
+                            win, grid, ROWS, width, algorithms, mazes, back_icon, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[6].toggle_color()
@@ -309,7 +313,7 @@ def main(win, width):
                         for node in row:
                             if node.is_barrier() or node.is_start() or node.is_end():
                                 node.reset()
-                    maze_gen_dfs(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
+                    maze_gen_dfs(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_icon,
                              options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
                     output.set_text1("1. Pick starting node")
                     output.set_text2("2. Pick ending node")
@@ -330,7 +334,7 @@ def main(win, width):
                         for node in row:
                             if node.is_barrier() or node.is_start() or node.is_end():
                                 node.reset()
-                    maze_gen_random(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
+                    maze_gen_random(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_icon,
                                 options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
                     output.set_text1("1. Pick starting node")
                     output.set_text2("2. Pick ending node")
@@ -351,7 +355,7 @@ def main(win, width):
                         for node in row:
                             if node.is_barrier() or node.is_start() or node.is_end():
                                 node.reset()
-                    maze_gen_kruskal(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
+                    maze_gen_kruskal(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_icon,
                                 options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
                     output.set_text1("1. Pick starting node")
                     output.set_text2("2. Pick ending node")
@@ -371,7 +375,7 @@ def main(win, width):
                         for node in row:
                             if node.is_barrier() or node.is_start() or node.is_end():
                                 node.reset()
-                    maze_gen_prims(lambda: draw(win, grid, ROWS, width, algorithms, mazes,
+                    maze_gen_prims(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_icon,
                                 options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
                     output.set_text1("1. Pick starting node")
                     output.set_text2("2. Pick ending node")

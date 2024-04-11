@@ -1,11 +1,11 @@
-from itertools import count
 import math
 import pygame
 import random
-from system import button,screen
+from system import button,screen,is_hover
 from themes.colors import *
 from themes.themes import *
 from sort_algos import *
+import main
 pygame.init()
 
 SIDE_PADDING = 40  # 50 on left and 50 on right
@@ -32,9 +32,8 @@ class DrawInformation:
         self.bar_height = math.floor((self.height - TOP_PADDING) / (list_range))
         self.start_x = SIDE_PADDING // 2
 
-def draw(draw_info, algorithms, options, output,theme_type, menu=True):
+def draw(draw_info, algorithms,back_icon, options, output,theme_type, menu=True):
     draw_info.window.fill(themes[theme_type]['plane_color'])
-    
     # Draw sorting visualizer
     draw_list(draw_info)
     
@@ -49,7 +48,8 @@ def draw(draw_info, algorithms, options, output,theme_type, menu=True):
         width = ht
         delta = 700
         end = ht//40
-        draw_info.window.blit(text, ((width+delta//2.5), (end-top)/2.5))
+        draw_info.window.blit(back_icon, ((width+delta//5.5), (end-top)/2.5))
+        draw_info.window.blit(text, ((width+delta//3.5), (end-top)/2.5))
         # Draw menu functions
         for algorithm in algorithms:
             algorithm.draw(draw_info.window)
@@ -58,7 +58,7 @@ def draw(draw_info, algorithms, options, output,theme_type, menu=True):
         but_height = ht//14.5
         top += (8*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        draw_info.window.blit(text, (width+delta//2 + 30, (end-top) + 1.1*top))
+        draw_info.window.blit(text, (width+delta//3 + 45, (end-top) + 1.1*top))
         
         for option in options:
             option.draw(draw_info.window)
@@ -112,6 +112,8 @@ def main(window):
     horizontal_gap_factor = but_width-but_height  
     vertical_gap_factor = but_height
     
+    back_icon = pygame.image.load('assets/back_icon.png')
+
     algorithms = [
         button(width+delta//4 +30, top_start + vertical_gap_factor,
                but_width-but_height-20, but_height, 'Bubble Sort'),
@@ -182,9 +184,9 @@ def main(window):
             except StopIteration:
                 sorting = False
         else:
-            draw(draw_info, algorithms, options, output,theme_type)
+            draw(draw_info, algorithms,back_icon, options, output,theme_type)
             
-        draw(draw_info,algorithms,options,output,theme_type)        
+        draw(draw_info,algorithms,back_icon,options,output,theme_type)        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -208,51 +210,55 @@ def main(window):
             
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
-                if algorithms[0].is_hover(pos):
+                if is_hover(back_icon,pos):
+                    print("Sending to Main Menu")
+                    main.main_menu()
+                    
+                elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = bubble_sort
                     sorting_algorithm_name = 'Bubble Sort'
                     
                 elif algorithms[1].is_hover(pos):
                     algorithms[1].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = selection_sort
                     sorting_algorithm_name = 'Selection Sort'
                 
                 elif algorithms[2].is_hover(pos):
                     algorithms[2].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = insertion_sort
                     sorting_algorithm_name = 'Insertion Sort'
 
                 elif algorithms[3].is_hover(pos):
                     algorithms[3].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = tim_sort
                     sorting_algorithm_name = 'Tim Sort'
 
                 elif algorithms[4].is_hover(pos):
                     algorithms[4].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = merge_sort
                     sorting_algorithm_name = 'Merge Sort'
                 
                 elif algorithms[5].is_hover(pos):
                     algorithms[5].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = quick_sort
                     sorting_algorithm_name = 'Quick Sort'
                 
                 elif algorithms[6].is_hover(pos):
                     algorithms[6].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = radix_sort
                     sorting_algorithm_name = 'Radix Sort'
                 
                 elif algorithms[7].is_hover(pos):
                     algorithms[7].toggle_color()
-                    output.draw(win, (0, 0, 0))
+                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = bucket_sort
                     sorting_algorithm_name = 'Bucket Sort'
                 
