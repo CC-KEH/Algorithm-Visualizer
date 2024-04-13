@@ -1,4 +1,4 @@
-from sort_main import *
+import sort_main
 from themes.colors import *
 MIN_MERGE = 32
 
@@ -29,7 +29,7 @@ def counting_sort(draw_info,arr, low, high, ascending=True):
         freq_arr[arr[i]] -= 1
     for i in range(len(arr)):
         arr[i] = output_array[i]
-        draw_list(draw_info, {i: 'green'}, clear_bg=True)
+        sort_main.draw_list(draw_info, {i: 'green'}, clear_bg=True)
         yield True
     return output_array
 
@@ -48,7 +48,7 @@ def bucket_sort(draw_info,lst,low,high, ascending=True):
         for j, item in enumerate(arr[i]):
             lst[k] = item
             k += 1
-            draw_list(draw_info, {k: GREEN}, True)
+            sort_main.draw_list(draw_info, {k: GREEN}, True)
             yield True
             
 def radix_count_sort(draw_info,arr,place,ascending=True):
@@ -73,7 +73,7 @@ def radix_count_sort(draw_info,arr,place,ascending=True):
     i = 0
     for i in range(0,len(arr)): 
         arr[i] = output_arr[i]
-        draw_list(draw_info, {i: 'green'}, clear_bg=True)
+        sort_main.draw_list(draw_info, {i: 'green'}, clear_bg=True)
         yield True 
  
 def radix_sort(draw_info,arr, low, high, ascending=True):
@@ -91,7 +91,7 @@ def bubble_sort(draw_info,arr,low,high,ascending=True):
         for j in range(high-i-1):
             if (arr[j]>arr[j+1] and ascending) or (arr[j]<arr[j+1] and not ascending):
                 arr[j],arr[j+1] = arr[j+1],arr[j]
-                draw_list(draw_info,{j:GREEN,j+1:RED},clear_bg=True)
+                sort_main.draw_list(draw_info,{j:GREEN,j+1:RED},clear_bg=True)
                 yield True
     return arr
         
@@ -101,10 +101,10 @@ def selection_sort(draw_info, arr, low, high, ascending=True):
         for j in range(i + 1, high):
             if (arr[j] < arr[min_idx] and ascending) or (arr[j] > arr[min_idx] and not ascending) :
                 min_idx = j
-                draw_list(draw_info, {i: 'green', min_idx: 'red'}, clear_bg=True)
+                sort_main.draw_list(draw_info, {i: 'green', min_idx: 'red'}, clear_bg=True)
                 yield True
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
-        draw_list(draw_info, {i: 'green', min_idx: 'red'}, clear_bg=True)
+        sort_main.draw_list(draw_info, {i: 'green', min_idx: 'red'}, clear_bg=True)
         yield True
     return arr
 
@@ -116,19 +116,19 @@ def insertion_sort(draw_info,arr,low,high,ascending=True):
             while j >= low and arr[j] > key:
                 arr[j + 1] = arr[j]
                 j -= 1
-                draw_list(draw_info, {j: 'green', j + 1: 'red'}, clear_bg=True)
+                sort_main.draw_list(draw_info, {j: 'green', j + 1: 'red'}, clear_bg=True)
                 yield True
             arr[j + 1] = key
-            draw_list(draw_info, {j + 1: 'blue'}, clear_bg=True)
+            sort_main.draw_list(draw_info, {j + 1: 'blue'}, clear_bg=True)
             yield True
         else:
             while j >= low and arr[j] < key:
                 arr[j + 1] = arr[j]
                 j -= 1
-                draw_list(draw_info, {j: 'green', j + 1: 'red'}, clear_bg=True)
+                sort_main.draw_list(draw_info, {j: 'green', j + 1: 'red'}, clear_bg=True)
                 yield True
             arr[j + 1] = key
-            draw_list(draw_info, {j + 1: 'blue'}, clear_bg=True)
+            sort_main.draw_list(draw_info, {j + 1: 'blue'}, clear_bg=True)
             yield True    
     return arr
 
@@ -159,21 +159,21 @@ def merge_sort(draw_info, lst,low,high, ascending=True):
 				lst[k] = R[j]
 				j += 1
 			k += 1
-			draw_list(draw_info, {k: GREEN}, True)
+			sort_main.draw_list(draw_info, {k: GREEN}, True)
 			yield True
 
 		while i < n1:
 			lst[k] = L[i]
 			i += 1
 			k += 1
-			draw_list(draw_info, {k: GREEN}, True)
+			sort_main.draw_list(draw_info, {k: GREEN}, True)
 			yield True
 
 		while j < n2:
 			lst[k] = R[j]
 			j += 1
 			k += 1
-			draw_list(draw_info, {k: GREEN}, True)
+			sort_main.draw_list(draw_info, {k: GREEN}, True)
 			yield True
 			return lst
 
@@ -197,11 +197,11 @@ def quick_sort(draw_info,lst,low,high, ascending=True):
 			if (lst[j] < pivot and ascending) or (lst[j] > pivot and not ascending):
 				i = i + 1
 				lst[i], lst[j] = lst[j], lst[i]
-				draw_list(draw_info, {i: GREEN, j: RED}, True)
+				sort_main.draw_list(draw_info, {i: GREEN, j: RED}, True)
 				yield True
 
 		lst[i + 1], lst[high] = lst[high], lst[i + 1]
-		draw_list(draw_info, {i + 1: GREEN, high: RED}, True)
+		sort_main.draw_list(draw_info, {i + 1: GREEN, high: RED}, True)
 		yield True
 		return (i + 1)
 
@@ -248,7 +248,7 @@ def merge(draw_info,arr, l, m, r,ascending):
                 arr[k] = right[j] 
                 j += 1
 
-        draw_list(draw_info, {k: 'green'}, clear_bg=True)
+        sort_main.draw_list(draw_info, {k: 'green'}, clear_bg=True)
         yield True
         k += 1
                
@@ -256,14 +256,14 @@ def merge(draw_info,arr, l, m, r,ascending):
         arr[k] = left[i] 
         k += 1
         i += 1
-        draw_list(draw_info, {}, clear_bg=True)
+        sort_main.draw_list(draw_info, {}, clear_bg=True)
         yield True
         
     while j < len2: 
         arr[k] = right[j] 
         k += 1
         j += 1
-        draw_list(draw_info, {}, clear_bg=True)
+        sort_main.draw_list(draw_info, {}, clear_bg=True)
         yield True
              
 def tim_sort(draw_info,arr, low, high, ascending=True):

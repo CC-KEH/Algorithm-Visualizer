@@ -1,11 +1,12 @@
 import math
+from turtle import back
 import pygame
 import random
-from system import button,screen,is_hover
+from system import button,screen,create_button,is_hover
 from themes.colors import *
 from themes.themes import *
 from sort_algos import *
-import main
+import main_app
 pygame.init()
 
 SIDE_PADDING = 40  # 50 on left and 50 on right
@@ -32,7 +33,7 @@ class DrawInformation:
         self.bar_height = math.floor((self.height - TOP_PADDING) / (list_range))
         self.start_x = SIDE_PADDING // 2
 
-def draw(draw_info, algorithms,back_icon, options, output,theme_type, menu=True):
+def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=True):
     draw_info.window.fill(themes[theme_type]['plane_color'])
     # Draw sorting visualizer
     draw_list(draw_info)
@@ -48,7 +49,7 @@ def draw(draw_info, algorithms,back_icon, options, output,theme_type, menu=True)
         width = ht
         delta = 700
         end = ht//40
-        draw_info.window.blit(back_icon, ((width+delta//5.5), (end-top)/2.5))
+        draw_info.window.blit(back_button["image"], back_button["rect"])
         draw_info.window.blit(text, ((width+delta//3.5), (end-top)/2.5))
         # Draw menu functions
         for algorithm in algorithms:
@@ -112,8 +113,9 @@ def main(window):
     horizontal_gap_factor = but_width-but_height  
     vertical_gap_factor = but_height
     
+    back_button = {}
     back_icon = pygame.image.load('assets/back_icon.png')
-
+    create_button(back_button,back_icon, ((1020), (900//40)/2.5))
     algorithms = [
         button(width+delta//4 +30, top_start + vertical_gap_factor,
                but_width-but_height-20, but_height, 'Bubble Sort'),
@@ -184,9 +186,9 @@ def main(window):
             except StopIteration:
                 sorting = False
         else:
-            draw(draw_info, algorithms,back_icon, options, output,theme_type)
+            draw(draw_info, algorithms,back_button, options, output,theme_type)
             
-        draw(draw_info,algorithms,back_icon,options,output,theme_type)        
+        draw(draw_info,algorithms,back_button,options,output,theme_type)        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -210,9 +212,9 @@ def main(window):
             
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
-                if is_hover(back_icon,pos):
+                if is_hover(back_button,pos):
                     print("Sending to Main Menu")
-                    main.main_menu()
+                    main_app.main_menu()
                     
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()

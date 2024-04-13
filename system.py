@@ -103,11 +103,18 @@ class screen():
         return False
 
 
+def create_button(button, image, position):
+    button["image"] = image
+    button["rect"] = image.get_rect(topleft=position)
+ 
+def is_hover(button, pos):
+    if button["rect"].collidepoint(pos):
+        return True
+    else:
+        return False
 
-
-def draw(win, grid, rows, width, algorithms, mazes,back_icon, options, output,theme_type='Default', menu = True):
+def draw(win, grid, rows, width, algorithms, mazes,back_button, options, output,theme_type='Default', menu = True):
     win.fill(themes[theme_type]["menu_bg_color"])
-    back_logo = pygame.image.load('assets/back_icon.png')
     for row in grid:
         for node in row:
             node.draw(win)
@@ -122,7 +129,7 @@ def draw(win, grid, rows, width, algorithms, mazes,back_icon, options, output,th
         text = font.render("Path Finding Algorithms", 1, WHITE)
         top = 0
         end = ht//40
-        win.blit(back_logo, ((width-80), (end-top)/2.5))
+        win.blit(back_button["image"], back_button["rect"])
         win.blit(text, ((width+delta//10), (end-top)/2.5))
         for algorithm in algorithms:
             algorithm.draw(win)
@@ -144,13 +151,4 @@ def draw(win, grid, rows, width, algorithms, mazes,back_icon, options, output,th
             option.draw(win)
         output.draw(win)
     pygame.display.update()
-
-
-def is_hover(icon,pos):
-    #Pos is the mouse position or a tuple of (x,y) coordinates
-    rect = icon.get_rect()
-    if pos[0] > rect.x - icon.get_height()//2 and pos[0] < rect.x + icon.get_width()+icon.get_height()//2:
-        if pos[1] > rect.y and pos[1] < rect.y + icon.get_height():
-            return True
-        
-    return False
+    
