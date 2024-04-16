@@ -119,10 +119,10 @@ def main(window):
     algorithms = [
         button(width+delta//4 +30, top_start + vertical_gap_factor,
                but_width-but_height-20, but_height, 'Bubble Sort'),
-    
+        
         button(width+delta//4+ 30, top_start + (2*vertical_gap_factor),
                but_width-but_height-20, but_height, 'Selection Sort'),
-    
+
         button(width+delta//4+ 30, top_start + (3*vertical_gap_factor),
                but_width-but_height-20, but_height, 'Insertion Sort'),
         
@@ -165,18 +165,20 @@ def main(window):
     sorting = False
     ascending = True
     sorting_algorithm = bubble_sort
-    sorting_algorithm_name = ""
+    sorting_algorithm_name = "Bubble Sort"
     sorting_algorithm_generator = None
     
     output = screen(sc_x_start, sc_y_start, sc_width, sc_height, "Choose an Algorithm")
     output.set_label1(f"Range: {n}")
     output.set_text1(f"{sorting_algorithm_name}")
+    output.set_text4(f"{lst}")
 
     run = True
     clock = pygame.time.Clock()
     low = 0
     high = len(draw_info.lst)
     speed = 60
+    is_uniform = False
     while run:
         clock.tick(speed)
         if sorting:
@@ -196,6 +198,7 @@ def main(window):
             if event.type == pygame.KEYDOWN:        
                 if event.key == pygame.K_r:
                     lst = generate_list(n, min_val, max_val)
+                    is_uniform = False
                     draw_info.set_list(lst)
                     sorting = False         
                 
@@ -212,58 +215,76 @@ def main(window):
             
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
+                output.set_error_message = ""
                 if is_hover(back_button,pos):
                     print("Sending to Main Menu")
                     main_app.main_menu()
                     
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = bubble_sort
                     sorting_algorithm_name = 'Bubble Sort'
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
                     
                 elif algorithms[1].is_hover(pos):
                     algorithms[1].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = selection_sort
                     sorting_algorithm_name = 'Selection Sort'
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
                 
                 elif algorithms[2].is_hover(pos):
                     algorithms[2].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = insertion_sort
                     sorting_algorithm_name = 'Insertion Sort'
-
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
+                    
                 elif algorithms[3].is_hover(pos):
                     algorithms[3].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = tim_sort
                     sorting_algorithm_name = 'Tim Sort'
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
 
                 elif algorithms[4].is_hover(pos):
                     algorithms[4].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
+                    output.draw(draw_info.window, BLACK)
                     sorting_algorithm = merge_sort
                     sorting_algorithm_name = 'Merge Sort'
-                
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
+                    
                 elif algorithms[5].is_hover(pos):
                     algorithms[5].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = quick_sort
                     sorting_algorithm_name = 'Quick Sort'
-                
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
+                    
                 elif algorithms[6].is_hover(pos):
                     algorithms[6].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = radix_sort
                     sorting_algorithm_name = 'Radix Sort'
-                
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
+
                 elif algorithms[7].is_hover(pos):
                     algorithms[7].toggle_color()
-                    output.draw(draw_info.window, (0, 0, 0))
                     sorting_algorithm = bucket_sort
                     sorting_algorithm_name = 'Bucket Sort'
-                
+                    output.set_text1(sorting_algorithm_name)
+                    output.set_text4(lst)
+                    output.draw(draw_info.window, BLACK)
+                    
                 elif options[0].is_hover(pos):
                     options[0].toggle_color()
                     lst = generate_list(n, min_val, max_val)
@@ -297,6 +318,7 @@ def main(window):
                 elif options[6].is_hover(pos):
                     options[6].toggle_color()
                     lst = generate_list(n, min_val, max_val,uniform=True)
+                    is_uniform = True                    
                     draw_info.set_list(lst)
                     sorting = False   
                                      

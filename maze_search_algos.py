@@ -20,7 +20,6 @@ def reconstruct_path(came_from, start, current, draw, visited,  win, width,theme
         if current != start:
             path.insert(0, current)
         current.make_path()
-#         path_animation(path)
         if is_draw:
             for rows in grid:
                 for node in rows:
@@ -334,8 +333,54 @@ def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold
         return maze_idastar(draw, win, width, output ,grid, start, end, threshold+10, moving_target, visited)
     return [], False
 
-def maze_bellman_ford(draw, grid, start, end, is_bidirectional=False):
-    pass
+def maze_bellman_ford(draw, grid, start, end, output, win, width, theme_type):
+    visited = []
+    came_from = {}
+    distances = {node: float('inf') for row in grid for node in row}
+    distances[start] = 0
+    for _ in range(len(grid)**2):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        for row in grid:
+            for node in row:
+                for neighbor in node.neighbors:
+                    if neighbor.is_barrier():
+                        continue
+                    if neighbor.is_weight():
+                        c = 5
+                    else:
+                        c = 1
+                    if distances[node] + c < distances[neighbor]:
+                        distances[neighbor] = distances[node] + c
+                        came_from[neighbor] = node
+                        neighbor.make_open()
+                        if neighbor == end:
+                            path, inc = reconstruct_path(
+                                came_from, start, end, draw, visited, win, width, theme_type,grid)
+                            start.make_start()
+                            output.set_text1(f"Path Length: {inc}")
+                            output.set_text2(f"#Visited nodes: {len(visited)}")
+                            if len(visited) != 0:
+                                output.set_text3(
+                                    f"Efficiency: {np.round(inc/len(visited), decimals=3)}")
+                            visit_animation(visited,theme_type)
+                            return visited, path
+
+        for row in grid:
+            for node in row:
+                if node != start:
+                    visited.append(node)
+                    node.make_visit()
+        visit_animation(visited,theme_type)
+        for row in grid:
+            for node in row:
+                node.draw(win)
+        draw_grid(win, len(grid), width)
+        pygame.display.update()
+
+    return visited, False
 
 def maze_floyd_warshall(draw, grid, start, end, is_bidirectional=False):
     pass

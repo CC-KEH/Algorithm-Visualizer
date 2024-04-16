@@ -1,4 +1,4 @@
-from turtle import back
+from turtle import back, color
 import pygame
 from themes.colors import *
 from themes.animations import *
@@ -56,16 +56,26 @@ class screen():
         self.text1 = text
         self.text2 = ""
         self.text3 = ""
+        self.text4 = ""
+        self.error_message = ""
         
     def set_label1(self, label):
         self.label1 = label
     
     def set_text1(self, text):
         self.text1 = text
+        
     def set_text2(self, text):
         self.text2 = text
+        
     def set_text3(self, text):
         self.text3 = text
+        
+    def set_text4(self, text):
+        self.text4 = text
+    
+    def set_error_message(self, text):
+        self.error_message = text
         
     def get_text1(self):
         return self.text1
@@ -76,6 +86,11 @@ class screen():
             
         pygame.draw.rect(win, self.color, (self.x,self.y,self.width,self.height),0)
         
+        if self.error_message!='':
+            font = pygame.font.SysFont('verdana', 50)
+            message = font.render(message, 1, (0,0,0))
+            win.blit(message, (self.x + (self.width/2 - message.get_width()/2), self.y + (self.height/2 - message.get_height()/2) - 50))
+        
         if self.label1 != '':
             font = pygame.font.SysFont('verdana', 20)
             label = font.render(self.label1, 1, (0,0,0))
@@ -85,14 +100,21 @@ class screen():
             font = pygame.font.SysFont('verdana', 30)
             text = font.render(self.text1, 1, (0,0,0))
             win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2) - 50))
+        
         if self.text2 != '':
             font = pygame.font.SysFont('verdana', 30)
             text = font.render(self.text2, 1, (0,0,0))
             win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
+        
         if self.text3 != '':
             font = pygame.font.SysFont('verdana', 30)
             text = font.render(self.text3, 1, (0,0,0))
             win.blit(text, (self.x + (self.width/2 - text.get_width()/2) - 50 , 50 + self.y + (self.height/2 - text.get_height()/2)))
+        
+        if self.text4 != '':
+            font = pygame.font.SysFont('verdana', 5)
+            text = font.render(self.text3, 1, (0,0,0))
+            win.blit(text, (self.x, self.y + (self.height/2 - text.get_height()/2)))
 
     def is_hover(self, pos):
         #Pos is the mouse position or a tuple of (x,y) coordinates

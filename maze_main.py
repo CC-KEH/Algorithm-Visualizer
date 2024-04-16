@@ -298,11 +298,35 @@ def main(win, width):
                         output.set_text3("")
                         output.draw(win, BLACK)
                         pygame.display.update()
-                        visited, path = maze_bellman_ford(lambda: draw(
+                        visited, path = maze_bi_astar(lambda: draw(
                             win, grid, ROWS, width, algorithms, mazes,back_button, options, output), grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[6].toggle_color()
+                
+                elif algorithms[7].is_hover(pos):
+                    algorithms[7].toggle_color()
+                    if len(weighted):
+                        for node in weighted:
+                            node.mark_weight()
+                    if start and end:
+                        for row in grid:
+                            for node in row:
+                                node.update_neighbors(grid)
+                                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
+                                    node.reset()
+                        visited = []
+                        path = []
+                        output.set_text1("......")
+                        output.set_text2("")
+                        output.set_text3("")
+                        output.draw(win, BLACK)
+                        pygame.display.update()
+                        visited, path = maze_bellman_ford(lambda: draw(
+                            win, grid, ROWS, width, algorithms, mazes,back_button, options, output), grid, start, end, output, win, width,theme_type)
+                        if not path:
+                            output.set_text1("Path not available")
+                        algorithms[7].toggle_color()
 
                 elif mazes[0].is_hover(pos):
                     output.set_text1("......")

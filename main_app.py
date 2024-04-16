@@ -21,9 +21,41 @@ BUTTON_WIDTH = 500
 BUTTON_HEIGHT = 300
 BOTTOM_SECTION_HEIGHT = 300
 
+# Information to display
+info = """
+Algorithm Visualizer
+
+Python program that showcases various sorting and pathfinding algorithms.
+
+Sorting Algorithms:
+Bubble, Selection, Insertion, Merge, Quick, Tim, Bucket, Radix, and Count Sort.
+
+Pathfinding Algorithms (Grid-based):
+BFS, Bi-BFS, DFS, Dijkstra, A*, IDA*, Floyd-Warshall, Bi-A*, and Bi-BFS.
+
+Enjoy exploring sorting and pathfinding algorithms with Algorithm Visualizer!
+"""
+
+# Split the information into lines
+lines = info.split('\n')
+
 # Set up the window
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Start Menu")
+
+
+# Function to create text objects
+def info_text_objects(text, font, color):
+    text_surface = font.render(text, True, color)
+    return text_surface, text_surface.get_rect()
+
+# Function to display text on screen
+def display_info_text(text, x, y, color, font_size=FONT_SIZE):
+    large_text = pygame.font.Font(None, font_size)
+    text_surf, text_rect = text_objects(text, large_text, color)
+    text_rect.topleft = (x, y)
+    window.blit(text_surf, text_rect)
+
 
 # Function to create text objects
 def text_objects(text, font, color):
@@ -70,6 +102,7 @@ def quit_game():
     pygame.quit()
     sys.exit()
 
+
 # Main menu loop
 def main_menu():
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -80,7 +113,16 @@ def main_menu():
                 pygame.quit()
                 sys.exit()
 
-        window.fill(WHITE)  # Clear screen with white color
+        window.fill(WHITE)
+
+        # Display the information
+        for i, line in enumerate(lines):
+            if i==1:
+                display_info_text(line, 10, i * FONT_SIZE, BLACK, font_size=50)
+            elif i == len(lines) - 1:
+                display_info_text(line, 10, i * FONT_SIZE, BLACK, font_size=20)
+            else:
+                display_info_text(line, 10, i * FONT_SIZE, BLACK,font_size=35)
 
         # Create buttons
         button("Pathfinding", 2*BUTTON_WIDTH, WINDOW_HEIGHT - WINDOW_HEIGHT, BUTTON_WIDTH, WINDOW_HEIGHT//2,

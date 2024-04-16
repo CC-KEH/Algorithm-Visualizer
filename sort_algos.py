@@ -15,41 +15,43 @@ def calculate_min_run(n):
     return n + r 
 
 # TODO: Add Descending functionality 
-def counting_sort(draw_info,arr, low, high, ascending=True):
-    max_val = max(arr)
-    freq_arr = [0] * (max_val+1)
-    for num in arr:
-        freq_arr[num] += 1
-    for i in range(1, max_val + 1):
-        freq_arr[i] += freq_arr[i - 1]
-    output_array = [0] * len(arr)
+# def counting_sort(draw_info,arr, low, high, ascending=True):
+#     max_val = max(arr)
+#     freq_arr = [0] * (max_val+1)
+#     for num in arr:
+#         freq_arr[num] += 1
+#     for i in range(1, max_val + 1):
+#         freq_arr[i] += freq_arr[i - 1]
+#     output_array = [0] * len(arr)
 
-    for i in range(len(arr) - 1, -1, -1):
-        output_array[freq_arr[arr[i]] - 1] = arr[i]
-        freq_arr[arr[i]] -= 1
-    for i in range(len(arr)):
-        arr[i] = output_array[i]
-        sort_main.draw_list(draw_info, {i: 'green'}, clear_bg=True)
-        yield True
-    return output_array
+#     for i in range(len(arr) - 1, -1, -1):
+#         output_array[freq_arr[arr[i]] - 1] = arr[i]
+#         freq_arr[arr[i]] -= 1
+#     for i in range(len(arr)):
+#         arr[i] = output_array[i]
+#         sort_main.draw_list(draw_info, {i: 'green'}, clear_bg=True)
+#         yield True
+#     return output_array
 
-def bucket_sort(draw_info,lst,low,high, ascending=True):
-    arr = []
-    slot_num = 10
-    for i in range(slot_num):
-        arr.append([])
-    for j in lst:
-        index_b = int(slot_num * j)
-        arr[index_b].append(j)
-    for i in range(slot_num):
-        arr[i] = sorted(arr[i])
-    k = 0
-    for i in range(slot_num):
-        for j, item in enumerate(arr[i]):
-            lst[k] = item
-            k += 1
-            sort_main.draw_list(draw_info, {k: GREEN}, True)
-            yield True
+
+
+# def bucket_sort(draw_info,lst,low,high, ascending=True):
+#     arr = []
+#     slot_num = 10
+#     for i in range(slot_num):
+#         arr.append([])
+#     for j in lst:
+#         index_b = int(slot_num * j)
+#         arr[index_b].append(j)
+#     for i in range(slot_num):
+#         arr[i] = sorted(arr[i])
+#     k = 0
+#     for i in range(slot_num):
+#         for j, item in enumerate(arr[i]):
+#             lst[k] = item
+#             k += 1
+#             sort_main.draw_list(draw_info, {k: GREEN}, True)
+#             yield True
             
 def radix_count_sort(draw_info,arr,place,ascending=True):
     n = len(arr) 
@@ -82,8 +84,90 @@ def radix_sort(draw_info,arr, low, high, ascending=True):
     while max_ele // place > 0:
         yield from radix_count_sort(draw_info,arr,place,ascending)
         place *= 10            
+           
             
+#* To Check
+def bucket_sort(draw_info, lst, low, high, ascending=True):
+    arr = []
+    slot_num = 10
+    for i in range(slot_num):
+        arr.append([])
+    for j in lst:
+        index_b = int(slot_num * j)
+        arr[index_b].append(j)
+    for i in range(slot_num):
+        arr[i] = sorted(arr[i], reverse=not ascending)
+    k = 0
+    for i in range(slot_num):
+        for j, item in enumerate(arr[i]):
+            lst[k] = item
+            k += 1
+            sort_main.draw_list(draw_info, {k: GREEN}, True)
+            yield True
             
+def counting_sort(draw_info, arr, low, high, ascending=True):
+    max_val = max(arr)
+    freq_arr = [0] * (max_val+1)
+    for num in arr:
+        freq_arr[num] += 1
+    for i in range(1, max_val + 1):
+        freq_arr[i] += freq_arr[i - 1]
+    output_array = [0] * len(arr)
+
+    if ascending:
+        for i in range(len(arr) - 1, -1, -1):
+            output_array[freq_arr[arr[i]] - 1] = arr[i]
+            freq_arr[arr[i]] -= 1
+    else:
+        for i in range(len(arr)):
+            output_array[i] = freq_arr[arr[i]]
+            freq_arr[arr[i]] -= 1
+
+    for i in range(len(arr)):
+        arr[i] = output_array[i]
+        sort_main.draw_list(draw_info, {i: 'green'}, clear_bg=True)
+        yield True
+
+    return output_array
+
+# def radix_count_sort(draw_info, arr, place, ascending=True):
+#     n = len(arr)
+#     output_arr = [0] * n
+#     count = [0] * 10
+
+#     for i in range(n):
+#         index = arr[i] / place
+#         count[int(index % 10)] += 1
+
+#     for i in range(1, 10):
+#         count[i] += count[i - 1]
+
+#     if ascending:
+#         i = n - 1
+#         while i >= 0:
+#             index = arr[i] / place
+#             output_arr[count[int(index % 10)] - 1] = arr[i]
+#             count[int(index % 10)] -= 1
+#             i -= 1
+#     else:
+#         i = 0
+#         while i < n:
+#             index = arr[i] / place
+#             output_arr[n - count[int(index % 10)]] = arr[i]
+#             count[int(index % 10)] -= 1
+#             i += 1
+
+#     for i in range(n):
+#         arr[i] = output_arr[i]
+#         sort_main.draw_list(draw_info, {i: 'green'}, clear_bg=True)
+#         yield True
+
+# def radix_sort(draw_info, arr, low, high, ascending=True):
+#     max_ele = max(arr)
+#     place = 1
+#     while max_ele // place > 0:
+#         yield from radix_count_sort(draw_info, arr, place, ascending)
+#         place *= 10
         
 #* Below works fine
 def bubble_sort(draw_info,arr,low,high,ascending=True):
