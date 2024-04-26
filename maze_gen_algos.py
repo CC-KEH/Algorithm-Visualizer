@@ -1,6 +1,9 @@
 import pygame
 import random
+import heapq
+from collections import defaultdict
 from grid import *
+
 
 def make_black(grid, win):
     for row in grid:
@@ -53,10 +56,10 @@ def maze_gen_random(draw, width, grid, start, end, left, right, top, bottom, win
         
             pygame.display.update()
 
-def maze_gen_prims(draw, grid):
+def maze_gen_kruskal(draw, width, grid, start, end, left, right, top, bottom, win, vertical=True):
     pass
 
-def maze_gen_kruskal(draw, grid):
+def maze_gen_prims(draw,width, grid, start, end, left, right, top, bottom, win, vertical=True):
     pass
 
 def binary_tree(draw, grid):

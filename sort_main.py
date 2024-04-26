@@ -1,4 +1,5 @@
 import math
+from operator import is_
 from turtle import back
 import pygame
 import random
@@ -6,6 +7,7 @@ from system import button,screen,create_button,is_hover
 from themes.colors import *
 from themes.themes import *
 from sort_algos import *
+from sort_info import *
 import main_app
 pygame.init()
 
@@ -33,10 +35,10 @@ class DrawInformation:
         self.bar_height = math.floor((self.height - TOP_PADDING) / (list_range))
         self.start_x = SIDE_PADDING // 2
 
-def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=True):
+def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=True,is_uniform=False):
     draw_info.window.fill(themes[theme_type]['plane_color'])
     # Draw sorting visualizer
-    draw_list(draw_info)
+    draw_list(draw_info,is_uniform=is_uniform)
     
     if menu:
         # Fill menu portion with black color
@@ -68,26 +70,75 @@ def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=Tr
     pygame.display.update()
 
 
-def draw_list(draw_info,color_positions={},clear_bg=False):
+# def draw_list(draw_info,color_positions={},clear_bg=False):
+#     lst = draw_info.lst
+#     if clear_bg:
+#         clear_rect = (SIDE_PADDING//2,TOP_PADDING,(draw_info.width-SIDE_PADDING),(draw_info.height-TOP_PADDING))
+#         pygame.draw.rect(draw_info.window,BACKGROUND_COLOR,clear_rect)
+        
+#     for i, val in enumerate(lst):
+#         x = draw_info.start_x + i * draw_info.bar_width
+#         y = draw_info.height - (val - draw_info.min_val) * (draw_info.bar_height)
+#         color = GRADIENTS[i % 3]
+#         # Calculate Exact height dont use draw_info.height
+#         if i in color_positions:
+#             color = color_positions[i]
+            
+#         pygame.draw.rect(
+#             draw_info.window, color, (x, y, draw_info.bar_width, draw_info.height)
+#         )
+#     if clear_bg:
+#         pygame.display.update()
+def draw_list(draw_info, color_positions={}, clear_bg=False, is_uniform=False):
     lst = draw_info.lst
     if clear_bg:
-        clear_rect = (SIDE_PADDING//2,TOP_PADDING,(draw_info.width-SIDE_PADDING),(draw_info.height-TOP_PADDING))
-        pygame.draw.rect(draw_info.window,BACKGROUND_COLOR,clear_rect)
-        
+        clear_rect = (SIDE_PADDING//2, TOP_PADDING, (draw_info.width-SIDE_PADDING), (draw_info.height-TOP_PADDING))
+        pygame.draw.rect(draw_info.window, BACKGROUND_COLOR, clear_rect)
+
+    if not is_uniform:
+        # Set the font and the width limit for the list area
+        font = pygame.font.SysFont('verdana', 15)
+        width_limit = draw_info.width - 2 * SIDE_PADDING
+
+        # Render each element of the list, starting a new line if the width limit is exceeded
+        total_width = 0
+        line_height = 0
+        lines = []
+        elements = []
+        for i, val in enumerate(lst):
+            text = font.render(str(val), 1, (0,0,0))
+            if total_width + text.get_width() > width_limit:  # Start a new line
+                lines.append(elements)
+                elements = []
+                total_width = 0
+                line_height += text.get_height()
+            elements.append((text, total_width, line_height))
+            total_width += text.get_width()
+            if i < len(lst) - 1:  # Don't render comma after the last element
+                comma = font.render(',', 1, (0,0,0))
+                elements.append((comma, total_width, line_height))
+                total_width += comma.get_width()
+        lines.append(elements)  # Add the last line
+
+        # Center align each line separately
+        for elements in lines:
+            total_width = sum(text.get_width() for text, _, _ in elements)
+            start_x = (draw_info.width - total_width) // 2
+            for text, x, y in elements:
+                draw_info.window.blit(text, (start_x + x, TOP_PADDING//2 + y))
+
     for i, val in enumerate(lst):
         x = draw_info.start_x + i * draw_info.bar_width
         y = draw_info.height - (val - draw_info.min_val) * (draw_info.bar_height)
         color = GRADIENTS[i % 3]
-        # Calculate Exact height dont use draw_info.height
         if i in color_positions:
             color = color_positions[i]
-            
+
         pygame.draw.rect(
             draw_info.window, color, (x, y, draw_info.bar_width, draw_info.height)
         )
     if clear_bg:
         pygame.display.update()
-
 
 def generate_list(n, min_val, max_val,uniform=False):
     lst = []
@@ -171,7 +222,7 @@ def main(window):
     output = screen(sc_x_start, sc_y_start, sc_width, sc_height, "Choose an Algorithm")
     output.set_label1(f"Range: {n}")
     output.set_text1(f"{sorting_algorithm_name}")
-    output.set_text4(f"{lst}")
+    output.set_text4(Bubble_Sort)
 
     run = True
     clock = pygame.time.Clock()
@@ -187,10 +238,11 @@ def main(window):
                 
             except StopIteration:
                 sorting = False
-        else:
-            draw(draw_info, algorithms,back_button, options, output,theme_type)
+        if is_uniform:  
+            draw(draw_info,algorithms,back_button,options,output,theme_type,is_uniform=True)        
+        else: 
+            draw(draw_info,algorithms,back_button,options,output,theme_type)        
             
-        draw(draw_info,algorithms,back_button,options,output,theme_type)        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -200,7 +252,7 @@ def main(window):
                     lst = generate_list(n, min_val, max_val)
                     is_uniform = False
                     draw_info.set_list(lst)
-                    sorting = False         
+                    sorting = False
                 
                 elif event.key == pygame.K_o and not sorting:
                     ascending = not ascending
@@ -209,7 +261,6 @@ def main(window):
                     if sorting_algorithm_generator == None:
                         sorting_algorithm = bubble_sort
                     sorting = True
-                    print(ascending)
                     sorting_algorithm_generator = sorting_algorithm(draw_info,draw_info.lst,low,high,ascending)
 
             
@@ -225,7 +276,7 @@ def main(window):
                     sorting_algorithm = bubble_sort
                     sorting_algorithm_name = 'Bubble Sort'
                     output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
+                    output.set_text4(Bubble_Sort)
                     output.draw(draw_info.window, BLACK)
                     
                 elif algorithms[1].is_hover(pos):
@@ -233,7 +284,7 @@ def main(window):
                     sorting_algorithm = selection_sort
                     sorting_algorithm_name = 'Selection Sort'
                     output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
+                    output.set_text4(Selection_Sort)
                     output.draw(draw_info.window, BLACK)
                 
                 elif algorithms[2].is_hover(pos):
@@ -241,7 +292,7 @@ def main(window):
                     sorting_algorithm = insertion_sort
                     sorting_algorithm_name = 'Insertion Sort'
                     output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
+                    output.set_text4(Insertion_Sort)
                     output.draw(draw_info.window, BLACK)
                     
                 elif algorithms[3].is_hover(pos):
@@ -249,7 +300,7 @@ def main(window):
                     sorting_algorithm = tim_sort
                     sorting_algorithm_name = 'Tim Sort'
                     output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
+                    output.set_text4(Tim_Sort)
                     output.draw(draw_info.window, BLACK)
 
                 elif algorithms[4].is_hover(pos):
@@ -258,7 +309,7 @@ def main(window):
                     sorting_algorithm = merge_sort
                     sorting_algorithm_name = 'Merge Sort'
                     output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
+                    output.set_text4(Merge_Sort)
                     output.draw(draw_info.window, BLACK)
                     
                 elif algorithms[5].is_hover(pos):
@@ -266,7 +317,7 @@ def main(window):
                     sorting_algorithm = quick_sort
                     sorting_algorithm_name = 'Quick Sort'
                     output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
+                    output.set_text4(Quick_Sort)
                     output.draw(draw_info.window, BLACK)
                     
                 elif algorithms[6].is_hover(pos):
@@ -274,42 +325,63 @@ def main(window):
                     sorting_algorithm = radix_sort
                     sorting_algorithm_name = 'Radix Sort'
                     output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
+                    output.set_text4(Radix_Sort)
                     output.draw(draw_info.window, BLACK)
 
                 elif algorithms[7].is_hover(pos):
                     algorithms[7].toggle_color()
-                    sorting_algorithm = bucket_sort
-                    sorting_algorithm_name = 'Bucket Sort'
-                    output.set_text1(sorting_algorithm_name)
-                    output.set_text4(lst)
-                    output.draw(draw_info.window, BLACK)
-                    
+                    if is_uniform:
+                        sorting_algorithm = bucket_sort
+                        sorting_algorithm_name = 'Bucket Sort'
+                        output.set_text1(sorting_algorithm_name)
+                        output.set_text4(Bucket_Sort)
+                        output.draw(draw_info.window, BLACK)
+                    else:
+                        sorting_algorithm_name = 'Bucket Sort'
+                        output.set_text1(sorting_algorithm_name)
+                        output.set_error_message("Uniform Array Required")
+                        output.draw(draw_info.window, BLACK)
+                                        
                 elif options[0].is_hover(pos):
                     options[0].toggle_color()
                     lst = generate_list(n, min_val, max_val)
                     draw_info.set_list(lst)
-                    sorting = False   
+                    sorting = False
                                      
                 elif options[1].is_hover(pos):
                     options[1].toggle_color()
                     if speed>=20:
                         speed-=10
+                        
                 
                 elif options[2].is_hover(pos):
                     options[2].toggle_color()
                     if speed<=90:
                         speed+=10
+                        
                 
                 elif options[3].is_hover(pos):
                     options[3].toggle_color()
                     if n>=20:
                         n-=10
-                
+                        lst = generate_list(n, min_val, max_val)
+                        draw_info.set_list(lst)
+                        sorting = False
+                        high = len(draw_info.lst)
+                    else:
+                        continue
+
                 elif options[4].is_hover(pos):
                     options[4].toggle_color()
                     if n<100:
                         n+=10
+                        lst = generate_list(n, min_val, max_val)
+                        draw_info.set_list(lst)
+                        sorting = False
+                        high = len(draw_info.lst)
+                    else:
+                        continue
+                        
                 
                 elif options[5].is_hover(pos):
                     options[5].toggle_color()
@@ -320,7 +392,9 @@ def main(window):
                     lst = generate_list(n, min_val, max_val,uniform=True)
                     is_uniform = True                    
                     draw_info.set_list(lst)
-                    sorting = False   
+                    sorting = False
+                    low = 0
+                    high = len(draw_info.lst)
                                      
                 
                 

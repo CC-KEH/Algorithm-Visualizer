@@ -5,6 +5,8 @@ from themes.animations import *
 from system import *
 from maze_search_algos import *
 from maze_gen_algos import *
+from gen_info import *
+from search_info import *
 import main_app
 
 
@@ -51,7 +53,7 @@ def main(win, width):
                (3*vertical_gap_factor), but_width-but_height, but_height, 'Bi-A*'),
    
         button(width + start_factor + horizontal_gap_factor, top_start +
-               (4*vertical_gap_factor), but_width-but_height, but_height, 'BellmanFord'),
+               (4*vertical_gap_factor), but_width-but_height, but_height, 'Bellman Ford'),
     ]
 
     mazes = [
@@ -137,6 +139,8 @@ def main(win, width):
                     
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
+                    output.set_text1("Breath First Search")
+                    output.set_text3(BFS)
                     output.draw(win, (0, 0, 0))
                     if len(weighted):
                         for node in weighted:
@@ -162,6 +166,8 @@ def main(win, width):
 
                 elif algorithms[1].is_hover(pos):
                     algorithms[1].toggle_color()
+                    output.set_text1("Bi-directional BFS")
+                    output.set_text3(BI_BFS)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -186,6 +192,8 @@ def main(win, width):
 
                 elif algorithms[2].is_hover(pos):
                     algorithms[2].toggle_color()
+                    output.set_text1("Depth First Search")
+                    output.set_text3(DFS)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -210,6 +218,8 @@ def main(win, width):
 
                 elif algorithms[3].is_hover(pos):
                     algorithms[3].toggle_color()
+                    output.set_text1("Dijkstra")
+                    output.set_text3(DIJKSTRA)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -234,6 +244,8 @@ def main(win, width):
 
                 elif algorithms[4].is_hover(pos):
                     algorithms[4].toggle_color()
+                    output.set_text1("A star")
+                    output.set_text3(A_STAR)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -251,13 +263,15 @@ def main(win, width):
                         output.draw(win, BLACK)
                         pygame.display.update()
                         visited, path = maze_astar(lambda: draw(win, grid, ROWS, width, algorithms, mazes,back_button, options, output),
-                                                 win, width, output, grid, start, end, theme_type)
+                                                 grid, start, end, output, win, width,theme_type)
                         if not path:
                             output.set_text1("Path not available")
                         algorithms[4].toggle_color()
 
                 elif algorithms[5].is_hover(pos):
                     algorithms[5].toggle_color()
+                    output.set_text1("Iterative Deepening A star")
+                    output.set_text3(IDA_STAR)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -282,6 +296,8 @@ def main(win, width):
 
                 elif algorithms[6].is_hover(pos):
                     algorithms[6].toggle_color()
+                    output.set_text1("Bi-directional A star")
+                    output.set_text3(BI_A_STAR)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -306,6 +322,9 @@ def main(win, width):
                 
                 elif algorithms[7].is_hover(pos):
                     algorithms[7].toggle_color()
+                    output.set_text1("Bellman-Ford")
+                    output.set_text3(FLOYD)
+                    
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -329,9 +348,9 @@ def main(win, width):
                         algorithms[7].toggle_color()
 
                 elif mazes[0].is_hover(pos):
-                    output.set_text1("......")
+                    output.set_text1("DFS Maze")
+                    output.set_text3(DFS_GEN)
                     output.set_text2("")
-                    output.set_text3("")
                     output.draw(win, BLACK)
                     pygame.display.update()
                     start = None
@@ -350,9 +369,9 @@ def main(win, width):
                     output.set_text3("3. Choose an algorithm")
 
                 elif mazes[1].is_hover(pos):
-                    output.set_text1("......")
-                    output.set_text2("")
-                    output.set_text3("")
+                    output.set_text1("Random Generation")
+                    output.set_text3(RANDOM)
+                    output.set_text2("......")
                     output.draw(win, BLACK)
                     pygame.display.update()
                     start = None
@@ -371,9 +390,9 @@ def main(win, width):
                     output.set_text3("3. Choose an algorithm")
                 
                 elif mazes[2].is_hover(pos):
-                    output.set_text1("......")
+                    output.set_text1("Kruskal Generation")
+                    output.set_text3(KRUSKAL)
                     output.set_text2("")
-                    output.set_text3("")
                     output.draw(win, BLACK)
                     pygame.display.update()
                     start = None
@@ -391,9 +410,9 @@ def main(win, width):
                     output.set_text2("2. Pick ending node")
                     output.set_text3("3. Choose an algorithm")
                 elif mazes[3].is_hover(pos):
-                    output.set_text1("......")
+                    output.set_text1("Prime's Generation")
+                    output.set_text3(PRIM)
                     output.set_text2("")
-                    output.set_text3("")
                     output.draw(win, BLACK)
                     pygame.display.update()
                     start = None

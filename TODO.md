@@ -1,10 +1,8 @@
 # TODO
 
-    - [ ] UI: Image or Text in Main page.
-    - [ ] Disable Bucket Button if not uniform Array.
-    - [ ] Floyd Warshall 
-    - [ ] Prims, Kruskal 
-    - [ ] Sorting Algos: Descending Order & range > 500. 
-    - [ ] Fix BFS in Maze.
+    - [ ] Remove Prims and Kruskal.
+    - [ ] Fix if any other issue.
+    - [ ] Themes, Bellman-Ford Colors.
+    - [ ] Fix set_error_message bug.
 
 ---

@@ -14,8 +14,10 @@ WINDOW_HEIGHT = 800
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (150, 150, 150)
-INACTIVE_BUTTON_COLOR = TEAL
-ACTIVE_BUTTON_COLOR = DARK_TEAL
+BTN_1 = (250, 146, 137)
+ACT_BTN_1 = (231, 116, 123)
+BTN_2 = (155, 141, 203)
+ACT_BTN_2 = (67, 59, 106)
 FONT_SIZE = 48
 BUTTON_WIDTH = 500
 BUTTON_HEIGHT = 300
@@ -27,13 +29,26 @@ Algorithm Visualizer
 
 Python program that showcases various sorting and pathfinding algorithms.
 
-Sorting Algorithms:
-Bubble, Selection, Insertion, Merge, Quick, Tim, Bucket, Radix, and Count Sort.
+Sorting Algorithms:\n
+Bubble Sort
+Selection Sort
+Insertion Sort
+Merge Sort
+Quick Sort
+Tim Sort
+Bucket Sort
+Radix Sort
+Count Sort
 
-Pathfinding Algorithms (Grid-based):
-BFS, Bi-BFS, DFS, Dijkstra, A*, IDA*, Floyd-Warshall, Bi-A*, and Bi-BFS.
-
-Enjoy exploring sorting and pathfinding algorithms with Algorithm Visualizer!
+Pathfinding Algorithms:\n
+BFS Search
+Bi-BFS Search
+DFS Search
+Dijkstra Search
+A* Search
+IDA* Search
+Bi-A* Search
+Floyd Warshall Search
 """
 
 # Split the information into lines
@@ -107,29 +122,42 @@ def quit_game():
 def main_menu():
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Start Menu")
+    # Load the background image
+    background = pygame.image.load('bg.png')
+
+    # Scale the image
+    background = pygame.transform.scale(background, (WINDOW_WIDTH-500, WINDOW_HEIGHT))
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        window.fill(WHITE)
-
+        # Draw the background image
+        window.blit(background, (0, 0))
+        in_path_search = False
         # Display the information
         for i, line in enumerate(lines):
-            if i==1:
-                display_info_text(line, 10, i * FONT_SIZE, BLACK, font_size=50)
-            elif i == len(lines) - 1:
-                display_info_text(line, 10, i * FONT_SIZE, BLACK, font_size=20)
-            else:
-                display_info_text(line, 10, i * FONT_SIZE, BLACK,font_size=35)
+            if line.endswith("Visualizer"):
+                display_info_text(line, 10, i * FONT_SIZE/2, BLACK, font_size=50)
+            elif not in_path_search:
+                display_info_text(line, 10, i * FONT_SIZE/2, BLACK,font_size=30)
+            elif in_path_search:
+                display_info_text(line, 10, i * FONT_SIZE/2.1, BLACK,font_size=30)
+            elif line.endswith("Sorting Algorithms:"):
+                display_info_text(line, 10, i * FONT_SIZE//2.1, BLACK, font_size=40)
+            elif line.endswith("Pathfinding Algorithms:"):
+                in_path_search = True
+                display_info_text(line, 10, i * FONT_SIZE//2.1, BLACK, font_size=40)
+                                
 
         # Create buttons
         button("Pathfinding", 2*BUTTON_WIDTH, WINDOW_HEIGHT - WINDOW_HEIGHT, BUTTON_WIDTH, WINDOW_HEIGHT//2,
-               INACTIVE_BUTTON_COLOR, ACTIVE_BUTTON_COLOR, start_pathfinding_visualizer)
+               BTN_1, ACT_BTN_1, start_pathfinding_visualizer)
         
         button("Sorting", 2*BUTTON_WIDTH, WINDOW_HEIGHT - WINDOW_HEIGHT//2, BUTTON_WIDTH, WINDOW_HEIGHT//2,
-               INACTIVE_BUTTON_COLOR, ACTIVE_BUTTON_COLOR, start_sorting_visualizer)
+               BTN_2, ACT_BTN_2, start_sorting_visualizer)
         
         pygame.display.update()
 

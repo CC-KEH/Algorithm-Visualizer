@@ -50,10 +50,9 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
         c = 1      
         
         for neighbor in current.neighbors: #*Check all the neighbors of the current node
-            if not neighbor.is_barrier():
+            if not neighbor.is_barrier() and neighbor not in visited:  # Ensure the neighbor is not a barrier and not visited
                 if neighbor.is_weight():
                     c = 5
-            if neighbor not in visited:
                 came_from[neighbor] = current
                 if(neighbor == end): 
                     path,inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
@@ -86,6 +85,7 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
     visited = [start]
     came_from = {}
     vis = 0
+    path = []  # Add this line to keep track of the current path
 
     while stack:
         for event in pygame.event.get():
@@ -93,6 +93,8 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
                 pygame.quit()
 
         current = stack.pop()
+        path.append(current)  # Add the current node to the path
+
         if current == end:
             path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
             start.make_start()
@@ -103,30 +105,29 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
                     f"Efficiency: {np.round(inc/vis, decimals=3)}")
             return visited, path
         c = 1
-        visited.append(current)
         for neighbor in current.neighbors:
-            if not neighbor.is_barrier():
+            if not neighbor.is_barrier() and neighbor not in visited and neighbor not in path:  # Check if the neighbor is in the path
                 if neighbor.is_weight():
                     c = 5
-                if neighbor not in visited:
-                    came_from[neighbor] = current
-                    stack.append(neighbor)
-                    neighbor.make_open()
-                    if (neighbor == end):
-                        path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
-                        start = start.make_start()
-                        output.set_text1(f"Path Length: {inc}")
-                        output.set_text2(f"#Visited nodes: {vis}")
-                        if vis != 0:
-                            output.set_text3(
-                                f"Efficiency: {np.round(inc/vis, decimals=3)}")
-                        return visited, path
+                came_from[neighbor] = current
+                stack.append(neighbor)
+                visited.append(neighbor)
+                neighbor.make_open()
+                if (neighbor == end):
+                    path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
+                    start = start.make_start()
+                    output.set_text1(f"Path Length: {inc}")
+                    output.set_text2(f"#Visited nodes: {vis}")
+                    if vis != 0:
+                        output.set_text3(
+                            f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                    return visited, path
 
         if current != start:
             vis += c
             current.make_visit()
 
-        visit_animation(visited,themes)
+        visit_animation(visited,theme_type)
 
         for rows in grid:
             for node in rows:
@@ -334,56 +335,41 @@ def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold
     return [], False
 
 def maze_bellman_ford(draw, grid, start, end, output, win, width, theme_type):
-    visited = []
-    came_from = {}
-    distances = {node: float('inf') for row in grid for node in row}
+    nodes = [node for row in grid for node in row]
+    edges = [(node, neighbor) for node in nodes for neighbor in node.neighbors if not neighbor.is_barrier()]
+
+    distances = {node: float('inf') for node in nodes}
     distances[start] = 0
-    for _ in range(len(grid)**2):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
 
-        for row in grid:
-            for node in row:
-                for neighbor in node.neighbors:
-                    if neighbor.is_barrier():
-                        continue
-                    if neighbor.is_weight():
-                        c = 5
-                    else:
-                        c = 1
-                    if distances[node] + c < distances[neighbor]:
-                        distances[neighbor] = distances[node] + c
-                        came_from[neighbor] = node
-                        neighbor.make_open()
-                        if neighbor == end:
-                            path, inc = reconstruct_path(
-                                came_from, start, end, draw, visited, win, width, theme_type,grid)
-                            start.make_start()
-                            output.set_text1(f"Path Length: {inc}")
-                            output.set_text2(f"#Visited nodes: {len(visited)}")
-                            if len(visited) != 0:
-                                output.set_text3(
-                                    f"Efficiency: {np.round(inc/len(visited), decimals=3)}")
-                            visit_animation(visited,theme_type)
-                            return visited, path
+    for _ in range(len(nodes) - 1):
+        for node, neighbor in edges:
+            if neighbor.is_barrier():
+                c = float('inf')
+            if neighbor.is_weight():
+                c = 5
+            else:
+                c = 1
+            if distances[node] + c < distances[neighbor]:
+                distances[neighbor] = distances[node] + c
+                neighbor.make_open()
 
-        for row in grid:
-            for node in row:
-                if node != start:
-                    visited.append(node)
-                    node.make_visit()
-        visit_animation(visited,theme_type)
-        for row in grid:
-            for node in row:
-                node.draw(win)
-        draw_grid(win, len(grid), width)
-        pygame.display.update()
+    # Reconstruct path
+    came_from = {}
+    node = end
+    while node != start:
+        came_from[node] = min((i for i in node.neighbors if not i.is_barrier()), key=distances.get)
+        node = came_from[node]
 
-    return visited, False
+    path, inc = reconstruct_path(came_from, start, end, draw, nodes, win, width, theme_type, grid)
+    start.make_start()
+    end.make_end()
+    output.set_text1(f"Path Length: {inc}")
+    output.set_text2(f"#Visited nodes: {len(nodes)}")
+    if len(nodes) != 0:
+        output.set_text3(f"Efficiency: {np.round(inc / len(nodes), decimals=3)}")
+    visit_animation(nodes, theme_type)
 
-def maze_floyd_warshall(draw, grid, start, end, is_bidirectional=False):
-    pass
+    return nodes, path
 
 def maze_jump_point(draw, grid, start, end, is_bidirectional=False):
     pass
