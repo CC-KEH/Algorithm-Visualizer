@@ -80,7 +80,7 @@ class screen():
     def get_text1(self):
         return self.text1
 
-    def draw(self,win,outline=None):
+    def draw(self,win,outline=None,theme_type='Default'):
         if outline:
             pygame.draw.rect(win, outline, (self.x-2,self.y-2,self.width+4,self.height+4),0)
             
@@ -104,8 +104,8 @@ class screen():
         
         if self.error_message!='':
             font = pygame.font.SysFont('verdana', 30)
-            error_message = font.render(self.error_message, 1, RED)
-            win.blit(error_message, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
+            error_message = font.render(self.error_message, 1, themes[theme_type]["font_color"])
+            win.blit(error_message, (self.x + (self.width/3 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
         
         
         if self.text3 != '':
@@ -152,26 +152,26 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button, options, output,
         width = ht
         w = 1600
         font = pygame.font.SysFont('verdana', 35)
-        text = font.render("Path Finding Algorithms", 1, WHITE)
+        text = font.render("Path Finding Algorithms", 1, themes[theme_type]["font_color"])
         top = 0
         end = ht//40
         win.blit(back_button["image"], back_button["rect"])
-        win.blit(text, ((width+delta//10), (end-top)/2.5))
+        win.blit(text, ((width+delta//10)-5, (end-top)/2.5))
         for algorithm in algorithms:
             algorithm.draw(win)
         
-        text = font.render("Generate Maze", 1, WHITE)
+        text = font.render("Generate Maze", 1, themes[theme_type]["font_color"])
         but_height = ht//15
         top += (4.3*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        win.blit(text, (width+delta//5.5, ((end-top)/2) + top))
+        win.blit(text, (width+delta//5.5, (end-top) + top))
         for maze in mazes:
             maze.draw(win)
             
         end += (1.3*(3*but_height//2)) + ht//6
         top += (1.7*but_height//2)
         
-        text = font.render("Grid Settings", 1, WHITE)
+        text = font.render("Grid Settings", 1, themes[theme_type]["font_color"])
         win.blit(text, (width+delta//5, ((end-top)/2) + top))
         for option in options:
             option.draw(win)

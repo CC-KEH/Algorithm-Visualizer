@@ -45,7 +45,7 @@ def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=Tr
         pygame.draw.rect(draw_info.window, themes[theme_type]["menu_bg_color"], (draw_info.width + 53, 0, draw_info.window.get_width() - draw_info.width, draw_info.window.get_height()))
 
         font = pygame.font.SysFont('verdana', 35)
-        text = font.render("Sorting Algorithms", 1, WHITE)
+        text = font.render("Sorting Algorithms", 1, themes[theme_type]["font_color"])
         top = 0
         ht = 900
         width = ht
@@ -57,7 +57,7 @@ def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=Tr
         for algorithm in algorithms:
             algorithm.draw(draw_info.window)
         
-        text = font.render("Settings", 1, WHITE)
+        text = font.render("Settings", 1, themes[theme_type]["font_color"])
         but_height = ht//14.5
         top += (8*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
@@ -70,25 +70,6 @@ def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=Tr
     pygame.display.update()
 
 
-# def draw_list(draw_info,color_positions={},clear_bg=False):
-#     lst = draw_info.lst
-#     if clear_bg:
-#         clear_rect = (SIDE_PADDING//2,TOP_PADDING,(draw_info.width-SIDE_PADDING),(draw_info.height-TOP_PADDING))
-#         pygame.draw.rect(draw_info.window,BACKGROUND_COLOR,clear_rect)
-        
-#     for i, val in enumerate(lst):
-#         x = draw_info.start_x + i * draw_info.bar_width
-#         y = draw_info.height - (val - draw_info.min_val) * (draw_info.bar_height)
-#         color = GRADIENTS[i % 3]
-#         # Calculate Exact height dont use draw_info.height
-#         if i in color_positions:
-#             color = color_positions[i]
-            
-#         pygame.draw.rect(
-#             draw_info.window, color, (x, y, draw_info.bar_width, draw_info.height)
-#         )
-#     if clear_bg:
-#         pygame.display.update()
 def draw_list(draw_info, color_positions={}, clear_bg=False, is_uniform=False):
     lst = draw_info.lst
     if clear_bg:
@@ -219,7 +200,7 @@ def main(window):
     sorting_algorithm_name = "Bubble Sort"
     sorting_algorithm_generator = None
     
-    output = screen(sc_x_start, sc_y_start, sc_width, sc_height, "Choose an Algorithm")
+    output = screen(sc_x_start, sc_y_start, sc_width, sc_height, "Choose an Algorithm",color=themes[theme_type]['output_screen_color'])
     output.set_label1(f"Range: {n}")
     output.set_text1(f"{sorting_algorithm_name}")
     output.set_text4(Bubble_Sort)
@@ -266,7 +247,7 @@ def main(window):
             
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
-                output.set_error_message = ""
+                output.set_error_message("")
                 if is_hover(back_button,pos):
                     print("Sending to Main Menu")
                     main_app.main_menu()
@@ -339,6 +320,7 @@ def main(window):
                     else:
                         sorting_algorithm_name = 'Bucket Sort'
                         output.set_text1(sorting_algorithm_name)
+                        output.set_text4("")
                         output.set_error_message("Uniform Array Required")
                         output.draw(draw_info.window, BLACK)
                                         
@@ -395,6 +377,11 @@ def main(window):
                     sorting = False
                     low = 0
                     high = len(draw_info.lst)
+                    if sorting_algorithm_name == 'Bucket Sort':
+                        sorting_algorithm = bucket_sort
+                        output.set_text1(sorting_algorithm_name)
+                        output.set_text4(Bucket_Sort)
+                        output.draw(draw_info.window, BLACK)
                                      
                 
                 

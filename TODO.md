@@ -1,8 +1,6 @@
 # TODO
 
-    - [ ] Remove Prims and Kruskal.
+    - [ ] Themes, give more wallpapers.
     - [ ] Fix if any other issue.
-    - [ ] Themes, Bellman-Ford Colors.
-    - [ ] Fix set_error_message bug.
 
 ---

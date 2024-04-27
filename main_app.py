@@ -123,7 +123,7 @@ def main_menu():
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Start Menu")
     # Load the background image
-    background = pygame.image.load('bg.png')
+    background = pygame.image.load('assets/bg.png')
 
     # Scale the image
     background = pygame.transform.scale(background, (WINDOW_WIDTH-500, WINDOW_HEIGHT))

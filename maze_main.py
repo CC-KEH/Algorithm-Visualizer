@@ -1,3 +1,4 @@
+from calendar import c
 import pygame
 from grid import *
 from themes.colors import *
@@ -57,13 +58,9 @@ def main(win, width):
     ]
 
     mazes = [
-        button(width + start_factor, top_start + (6*vertical_gap_factor), but_width-but_height, but_height, "DFS Maze"),
+        button(width + start_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "DFS Maze"),
 
-        button(width + start_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "Random"),
-
-        button(width + start_factor + horizontal_gap_factor, top_start + (6*vertical_gap_factor), but_width-but_height, but_height, "Kruskal"),
-
-        button(width + start_factor + horizontal_gap_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "Prim's"),
+        button(width + start_factor + horizontal_gap_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "Random"),
     ]
     but_width = but_width//1.4
     horizontal_gap_factor = but_width-but_height
@@ -81,7 +78,7 @@ def main(win, width):
     sc_height = 250
     sc_width = delta-delta//4
     output = screen(width+start_factor-2.1, sc_start, 700,
-                    sc_height, "Choose an Algorithm")
+                    sc_height, "Choose an Algorithm",color=themes[theme_type]["output_screen_color"])
     output.set_label1(f"Rows: {ROWS}")
     output.set_text1("1. Choose the starting node")
     output.set_text2("2. Choose the ending node")
@@ -389,47 +386,7 @@ def main(win, width):
                     output.set_text2("2. Pick ending node")
                     output.set_text3("3. Choose an algorithm")
                 
-                elif mazes[2].is_hover(pos):
-                    output.set_text1("Kruskal Generation")
-                    output.set_text3(KRUSKAL)
-                    output.set_text2("")
-                    output.draw(win, BLACK)
-                    pygame.display.update()
-                    start = None
-                    end = None
-                    visited = []
-                    path = []
-                    weighted = []
-                    for row in grid:
-                        for node in row:
-                            if node.is_barrier() or node.is_start() or node.is_end():
-                                node.reset()
-                    maze_gen_kruskal(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_button,
-                                options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
-                elif mazes[3].is_hover(pos):
-                    output.set_text1("Prime's Generation")
-                    output.set_text3(PRIM)
-                    output.set_text2("")
-                    output.draw(win, BLACK)
-                    pygame.display.update()
-                    start = None
-                    end = None
-                    visited = []
-                    path = []
-                    weighted = []
-                    for row in grid:
-                        for node in row:
-                            if node.is_barrier() or node.is_start() or node.is_end():
-                                node.reset()
-                    maze_gen_prims(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_button,
-                                options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
-
+                
                 elif options[0].is_hover(pos):
                     output.set_text1("1. Pick starting node")
                     output.set_text2("2. Pick ending node")
