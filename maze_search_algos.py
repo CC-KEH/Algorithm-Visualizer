@@ -4,6 +4,9 @@ from themes.colors import *
 from themes.animations import *
 from utils import *
 from grid import *
+import numpy as np
+
+SCALE_FACTOR = 30
 
 def reconstruct_path(came_from, start, current, draw, visited,  win, width,theme_type, grid,is_draw = True): 
     path = []
@@ -34,6 +37,7 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
     came_from = {}
     vis = 0
     while queue:
+        start.make_start()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -47,7 +51,7 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
             if vis != 0:
                 output.set_text3(f"Efficiency: {np.round(inc/vis, decimals=3)}")
             return visited, path
-        c = 1      
+        c = 1
         
         for neighbor in current.neighbors: #*Check all the neighbors of the current node
             if not neighbor.is_barrier() and neighbor not in visited:  # Ensure the neighbor is not a barrier and not visited
@@ -65,6 +69,8 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
                 queue.append(neighbor)
                 visited.append(neighbor)
                 neighbor.make_open()   
+                distance = h_score(neighbor.get_pos(), end.get_pos())
+                play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
         if current != start:
             vis+=c

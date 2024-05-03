@@ -3,11 +3,7 @@ import pygame
 import sys
 import maze_main
 import sort_main
-from themes.colors import DARK_GREEN, DARK_TEAL, TEAL
-
-# Initialize Pygame
 pygame.init()
-
 # Constants
 WINDOW_WIDTH = 1500
 WINDOW_HEIGHT = 800
@@ -123,7 +119,7 @@ def main_menu():
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Start Menu")
     # Load the background image
-    background = pygame.image.load('assets/bg.png')
+    background = pygame.image.load('assets/bg_default.png')
 
     # Scale the image
     background = pygame.transform.scale(background, (WINDOW_WIDTH-500, WINDOW_HEIGHT))

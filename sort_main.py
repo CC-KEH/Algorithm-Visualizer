@@ -2,6 +2,7 @@ import math
 from operator import is_
 from turtle import back
 import pygame
+import pygame.gfxdraw
 import random
 from system import button,screen,create_button,is_hover
 from themes.colors import *
@@ -35,29 +36,30 @@ class DrawInformation:
         self.bar_height = math.floor((self.height - TOP_PADDING) / (list_range))
         self.start_x = SIDE_PADDING // 2
 
-def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=True,is_uniform=False):
+def draw(draw_info, algorithms, back_button, sound_button, options, output, theme_type, menu=True,is_uniform=False):
     draw_info.window.fill(themes[theme_type]['plane_color'])
     # Draw sorting visualizer
-    draw_list(draw_info,is_uniform=is_uniform)
+    draw_list(draw_info,theme_type=theme_type,is_uniform=is_uniform)
     
     if menu:
         # Fill menu portion with black color
         pygame.draw.rect(draw_info.window, themes[theme_type]["menu_bg_color"], (draw_info.width + 53, 0, draw_info.window.get_width() - draw_info.width, draw_info.window.get_height()))
 
         font = pygame.font.SysFont('verdana', 35)
-        text = font.render("Sorting Algorithms", 1, themes[theme_type]["font_color"])
+        text = font.render("Sorting Algorithms", 1, themes[theme_type]["heading_color"])
         top = 0
         ht = 900
         width = ht
         delta = 700
         end = ht//40
         draw_info.window.blit(back_button["image"], back_button["rect"])
-        draw_info.window.blit(text, ((width+delta//3.5), (end-top)/2.5))
+        draw_info.window.blit(text, ((width+delta//3.7), (end-top)/2.5))
+        draw_info.window.blit(sound_button["image"], sound_button["rect"])
         # Draw menu functions
         for algorithm in algorithms:
             algorithm.draw(draw_info.window)
         
-        text = font.render("Settings", 1, themes[theme_type]["font_color"])
+        text = font.render("Settings", 1, themes[theme_type]["heading_color"])
         but_height = ht//14.5
         top += (8*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
@@ -66,19 +68,20 @@ def draw(draw_info, algorithms, back_button, options, output,theme_type, menu=Tr
         for option in options:
             option.draw(draw_info.window)
             
-        output.draw(draw_info.window)    
+        output.draw(draw_info.window)
     pygame.display.update()
 
 
-def draw_list(draw_info, color_positions={}, clear_bg=False, is_uniform=False):
+
+def draw_list(draw_info, color_positions={}, theme_type='Default', clear_bg=False, is_uniform=False):
     lst = draw_info.lst
     if clear_bg:
         clear_rect = (SIDE_PADDING//2, TOP_PADDING, (draw_info.width-SIDE_PADDING), (draw_info.height-TOP_PADDING))
-        pygame.draw.rect(draw_info.window, BACKGROUND_COLOR, clear_rect)
+        pygame.draw.rect(draw_info.window, themes[theme_type]['plane_color'], clear_rect)
 
     if not is_uniform:
         # Set the font and the width limit for the list area
-        font = pygame.font.SysFont('verdana', 15)
+        font = pygame.font.SysFont('verdana', 17)
         width_limit = draw_info.width - 2 * SIDE_PADDING
 
         # Render each element of the list, starting a new line if the width limit is exceeded
@@ -87,16 +90,16 @@ def draw_list(draw_info, color_positions={}, clear_bg=False, is_uniform=False):
         lines = []
         elements = []
         for i, val in enumerate(lst):
-            text = font.render(str(val), 1, (0,0,0))
+            text = font.render(str(val), 1, themes[theme_type]['list_font_color'])
             if total_width + text.get_width() > width_limit:  # Start a new line
                 lines.append(elements)
                 elements = []
                 total_width = 0
-                line_height += text.get_height()
+                line_height += text.get_height() + 10
             elements.append((text, total_width, line_height))
             total_width += text.get_width()
             if i < len(lst) - 1:  # Don't render comma after the last element
-                comma = font.render(',', 1, (0,0,0))
+                comma = font.render(', ', 1, themes[theme_type]['list_font_color'])
                 elements.append((comma, total_width, line_height))
                 total_width += comma.get_width()
         lines.append(elements)  # Add the last line
@@ -111,13 +114,21 @@ def draw_list(draw_info, color_positions={}, clear_bg=False, is_uniform=False):
     for i, val in enumerate(lst):
         x = draw_info.start_x + i * draw_info.bar_width
         y = draw_info.height - (val - draw_info.min_val) * (draw_info.bar_height)
-        color = GRADIENTS[i % 3]
+        color = themes[theme_type]['bars_color'][i % 3]
         if i in color_positions:
             color = color_positions[i]
 
-        pygame.draw.rect(
-            draw_info.window, color, (x, y, draw_info.bar_width, draw_info.height)
-        )
+        if theme_type == 'Default':
+            target_color = themes[theme_type]['bars_color_2'][i % 3]
+            t = (pygame.time.get_ticks() % 2000) / 2000  # Change 2000 to adjust speed
+            t = (math.sin(t * 2 * math.pi) + 1) / 2  # Map time to [0, 1] range
+            color = (
+                color[0] * (1 - t) + target_color[0] * t,
+                color[1] * (1 - t) + target_color[1] * t,
+                color[2] * (1 - t) + target_color[2] * t
+            )
+        pygame.draw.rect(draw_info.window, color, (x, y, draw_info.bar_width, draw_info.height))
+
     if clear_bg:
         pygame.display.update()
 
@@ -129,8 +140,7 @@ def generate_list(n, min_val, max_val,uniform=False):
     return lst
 
 
-def main(window):
-    theme_type = 'Default'
+def main(window,theme_type='Default'):
     w, ht = pygame.display.get_surface().get_size()
     width = ht #Sort Display
     delta = w - width
@@ -146,8 +156,18 @@ def main(window):
     vertical_gap_factor = but_height
     
     back_button = {}
-    back_icon = pygame.image.load('assets/back_icon.png')
-    create_button(back_button,back_icon, ((1020), (900//40)/2.5))
+    sound_button = {}
+    back_icon = pygame.image.load('assets/back_black.png')
+    muted = False
+    if theme_type == 'Default':
+        sound_icon = pygame.image.load('assets/black_sound_icon.png')
+        mute_icon = pygame.image.load('assets/black_mute_icon.png')
+    else:
+        sound_icon = pygame.image.load('assets/white_sound_icon.png')
+        mute_icon = pygame.image.load('assets/white_mute_icon.png')
+        
+    create_button(back_button, back_icon, ((1020), (900//40)/2.5))
+    create_button(sound_button, sound_icon, ((1440), (900//40)/2.5))
     algorithms = [
         button(width+delta//4 +30, top_start + vertical_gap_factor,
                but_width-but_height-20, but_height, 'Bubble Sort'),
@@ -179,7 +199,7 @@ def main(window):
     options_start_top = top_start + (8*vertical_gap_factor) + 2
     options = [
         button(width+delta//4 + 30, options_start_top, options_fst_hf_wdt, but_height, "Generate"),
-        button(width+delta//4 + 30 +options_fst_hf_wdt,  options_start_top,   options_fst_hf_wdt, but_height, "Slow"),
+        button(width+delta//4 + 30 +options_fst_hf_wdt,  options_start_top,   options_fst_hf_wdt, but_height, "Slow   "),
         button(options_sec_hf_st, options_start_top, options_sec_hf_wdt, but_height, "Fast"),
         button(options_sec_hf_st + options_sec_hf_wdt, options_start_top, options_sec_hf_wdt, but_height, "-"),
         button(options_sec_hf_st + options_sec_hf_wdt*2, options_start_top, options_sec_hf_wdt, but_height, "+"),
@@ -188,7 +208,7 @@ def main(window):
     ]
     #* Result Screen
     sc_y_start = ht-240
-    sc_x_start = width+delta//4 + 28
+    sc_x_start = width+delta//4 + 30 #28
     sc_height = 250
     sc_width = (but_width-but_height-17)*2
     lst = generate_list(n, min_val, max_val,uniform=False)
@@ -196,14 +216,17 @@ def main(window):
     draw_info = DrawInformation(width + 150, width, lst, window)
     sorting = False
     ascending = True
-    sorting_algorithm = bubble_sort
-    sorting_algorithm_name = "Bubble Sort"
+    sorting_algorithm = None
+    sorting_algorithm_name = ""
     sorting_algorithm_generator = None
     
     output = screen(sc_x_start, sc_y_start, sc_width, sc_height, "Choose an Algorithm",color=themes[theme_type]['output_screen_color'])
     output.set_label1(f"Range: {n}")
-    output.set_text1(f"{sorting_algorithm_name}")
-    output.set_text4(Bubble_Sort)
+    output.set_text1("Instructions")
+    output.set_text4("""
+                     1. Select an Algorithm.
+                     2. Press Space to Start.
+                     """)
 
     run = True
     clock = pygame.time.Clock()
@@ -220,9 +243,9 @@ def main(window):
             except StopIteration:
                 sorting = False
         if is_uniform:  
-            draw(draw_info,algorithms,back_button,options,output,theme_type,is_uniform=True)        
+            draw(draw_info,algorithms,back_button,sound_button,options,output,theme_type,is_uniform=True)        
         else: 
-            draw(draw_info,algorithms,back_button,options,output,theme_type)        
+            draw(draw_info,algorithms,back_button,sound_button,options,output,theme_type)        
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -239,10 +262,12 @@ def main(window):
                     ascending = not ascending
                 
                 elif event.key == pygame.K_SPACE and not sorting:
-                    if sorting_algorithm_generator == None:
+                    if sorting_algorithm == None:
                         sorting_algorithm = bubble_sort
+                        sorting_algorithm_name = 'Bubble Sort'
+                        
                     sorting = True
-                    sorting_algorithm_generator = sorting_algorithm(draw_info,draw_info.lst,low,high,ascending)
+                    sorting_algorithm_generator = sorting_algorithm(draw_info, draw_info.lst, low, high, ascending, theme_type, muted)
 
             
             if pygame.mouse.get_pressed()[0]:
@@ -251,6 +276,13 @@ def main(window):
                 if is_hover(back_button,pos):
                     print("Sending to Main Menu")
                     main_app.main_menu()
+                
+                if is_hover(sound_button,pos):
+                    muted = not muted
+                    if muted:
+                        sound_button["image"] = mute_icon
+                    else:
+                        sound_button["image"] = sound_icon
                     
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
@@ -350,6 +382,7 @@ def main(window):
                         draw_info.set_list(lst)
                         sorting = False
                         high = len(draw_info.lst)
+                        output.set_label1(f"Range: {n}")
                     else:
                         continue
 
@@ -361,6 +394,7 @@ def main(window):
                         draw_info.set_list(lst)
                         sorting = False
                         high = len(draw_info.lst)
+                        output.set_label1(f"Range: {n}")
                     else:
                         continue
                         

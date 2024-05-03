@@ -7,6 +7,7 @@ from themes.themes import *
 class button():
     def __init__(self, x, y,width,height, text='',theme_type='Default'):
         self.color = themes[theme_type]["inactive_button_color"]
+        self.text_color = themes[theme_type]["button_text_color"]
         self.x = x
         self.y = y
         self.width = width
@@ -27,7 +28,7 @@ class button():
 
         if self.text != '':
             font = pygame.font.SysFont('verdana', 20)
-            text = font.render(self.text, 1, (255,255,255))
+            text = font.render(self.text, 1, self.text_color)
             win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
 
     def is_hover(self, pos):
@@ -95,7 +96,7 @@ class screen():
         if self.text1 != '':
             font = pygame.font.SysFont('verdana', 30)
             text = font.render(self.text1, 1, (0,0,0))
-            win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2) - 80))
+            win.blit(text, (self.x + (self.width/2 - text.get_width()/2)+15, self.y + (self.height/2 - text.get_height()/2) - 80))
         
         if self.text2 != '':
             font = pygame.font.SysFont('verdana', 30)
@@ -156,7 +157,7 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button, options, output,
         top = 0
         end = ht//40
         win.blit(back_button["image"], back_button["rect"])
-        win.blit(text, ((width+delta//10)-5, (end-top)/2.5))
+        win.blit(text, ((width+delta//10)-15, (end-top)/2.5))
         for algorithm in algorithms:
             algorithm.draw(win)
         
@@ -164,7 +165,7 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button, options, output,
         but_height = ht//15
         top += (4.3*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        win.blit(text, (width+delta//5.5, (end-top) + top))
+        win.blit(text, (width+delta//5.3, (end-top) + top))
         for maze in mazes:
             maze.draw(win)
             
@@ -172,7 +173,7 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button, options, output,
         top += (1.7*but_height//2)
         
         text = font.render("Grid Settings", 1, themes[theme_type]["font_color"])
-        win.blit(text, (width+delta//5, ((end-top)/2) + top))
+        win.blit(text, (width+delta//4.7, ((end-top)/2) + top))
         for option in options:
             option.draw(win)
         output.draw(win)

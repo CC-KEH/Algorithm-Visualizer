@@ -28,61 +28,61 @@ def main(win, width):
 
     # Define your button
     back_button = {}
-    back_icon = pygame.image.load('assets/back_icon.png')
-    # create_button(button,back_icon,((width-80), (end-top)/2.5))
+    back_icon = pygame.image.load('assets/back_black.png')
     create_button(back_button,back_icon,((820), (ht//40)/2.5))
     algorithms = [
         button(width + start_factor, top_start + vertical_gap_factor,
-               but_width-but_height, but_height, 'BFS'),
+               but_width-but_height, but_height, 'BFS',theme_type=theme_type),
     
         button(width + start_factor, top_start + (2*vertical_gap_factor),
-               but_width-but_height, but_height, 'Bi-BFS'),
+               but_width-but_height, but_height, 'Bi-BFS',theme_type=theme_type),
     
         button(width + start_factor, top_start + (3*vertical_gap_factor),
-               but_width-but_height, but_height, 'DFS'),
+               but_width-but_height, but_height, 'DFS',theme_type=theme_type),
         
         button(width + start_factor, top_start + (4*vertical_gap_factor), 
-               but_width-but_height, but_height, 'Dijkstra'),
+               but_width-but_height, but_height, 'Dijkstra',theme_type=theme_type),
         
         button(width + start_factor + horizontal_gap_factor,
-               top_start + vertical_gap_factor, but_width-but_height, but_height, "A*"),
+               top_start + vertical_gap_factor, but_width-but_height, but_height, "A*",theme_type=theme_type),
 
         button(width + start_factor + horizontal_gap_factor, top_start +
-                (2*vertical_gap_factor), but_width-but_height, but_height, 'IDA*'),
+                (2*vertical_gap_factor), but_width-but_height, but_height, 'IDA*',theme_type=theme_type),
 
         button(width + start_factor + horizontal_gap_factor, top_start +
-               (3*vertical_gap_factor), but_width-but_height, but_height, 'Bi-A*'),
+               (3*vertical_gap_factor), but_width-but_height, but_height, 'Bi-A*',theme_type=theme_type),
    
         button(width + start_factor + horizontal_gap_factor, top_start +
-               (4*vertical_gap_factor), but_width-but_height, but_height, 'Bellman Ford'),
+               (4*vertical_gap_factor), but_width-but_height, but_height, 'Bellman Ford',theme_type=theme_type),
     ]
 
     mazes = [
-        button(width + start_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "DFS Maze"),
+        button(width + start_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "DFS Maze",theme_type=theme_type),
 
-        button(width + start_factor + horizontal_gap_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "Random"),
+        button(width + start_factor + horizontal_gap_factor, top_start + (7*vertical_gap_factor), but_width-but_height, but_height, "Random",theme_type=theme_type),
     ]
     but_width = but_width//1.4
     horizontal_gap_factor = but_width-but_height
     options = [
         button(width + start_factor, top_start +
-               (9*vertical_gap_factor), but_width-but_height, but_height, "Clear"),
+               (9*vertical_gap_factor), but_width-but_height, but_height, "Clear",theme_type=theme_type),
         
         button(width + start_factor + horizontal_gap_factor, top_start +
-               (9*vertical_gap_factor), but_width-but_height, but_height, "Decrease Nodes"),
+               (9*vertical_gap_factor), but_width-but_height, but_height, "Decrease Nodes",theme_type=theme_type),
         
         button(width + start_factor + (2*horizontal_gap_factor), top_start +
-               (9*vertical_gap_factor), but_width-but_height, but_height, "Increase Nodes"),
+               (9*vertical_gap_factor), but_width-but_height, but_height, "Increase Nodes",theme_type=theme_type),
     ]
     sc_start = ht-240
     sc_height = 250
-    sc_width = delta-delta//4
-    output = screen(width+start_factor-2.1, sc_start, 700,
-                    sc_height, "Choose an Algorithm",color=themes[theme_type]["output_screen_color"])
+    output = screen(width+start_factor, sc_start, 700,
+                    sc_height, "Instructions",color=themes[theme_type]["output_screen_color"])
     output.set_label1(f"Rows: {ROWS}")
-    output.set_text1("1. Choose the starting node")
-    output.set_text2("2. Choose the ending node")
-    output.set_text3("3. Choose the algorithm")
+    output.set_text4("""
+                     1. Pick source node\n
+                     2. Pick destination node\n
+                     3. Select the search algorithm.\n
+                     """)
 
     start = None
     end = None
@@ -137,7 +137,7 @@ def main(win, width):
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
                     output.set_text1("Breath First Search")
-                    output.set_text3(BFS)
+                    output.set_text4(BFS)
                     output.draw(win, (0, 0, 0))
                     if len(weighted):
                         for node in weighted:
@@ -164,7 +164,7 @@ def main(win, width):
                 elif algorithms[1].is_hover(pos):
                     algorithms[1].toggle_color()
                     output.set_text1("Bi-directional BFS")
-                    output.set_text3(BI_BFS)
+                    output.set_text4(BI_BFS)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -190,7 +190,7 @@ def main(win, width):
                 elif algorithms[2].is_hover(pos):
                     algorithms[2].toggle_color()
                     output.set_text1("Depth First Search")
-                    output.set_text3(DFS)
+                    output.set_text4(DFS)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -216,7 +216,7 @@ def main(win, width):
                 elif algorithms[3].is_hover(pos):
                     algorithms[3].toggle_color()
                     output.set_text1("Dijkstra")
-                    output.set_text3(DIJKSTRA)
+                    output.set_text4(DIJKSTRA)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -242,7 +242,7 @@ def main(win, width):
                 elif algorithms[4].is_hover(pos):
                     algorithms[4].toggle_color()
                     output.set_text1("A star")
-                    output.set_text3(A_STAR)
+                    output.set_text4(A_STAR)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -268,7 +268,7 @@ def main(win, width):
                 elif algorithms[5].is_hover(pos):
                     algorithms[5].toggle_color()
                     output.set_text1("Iterative Deepening A star")
-                    output.set_text3(IDA_STAR)
+                    output.set_text4(IDA_STAR)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -294,7 +294,7 @@ def main(win, width):
                 elif algorithms[6].is_hover(pos):
                     algorithms[6].toggle_color()
                     output.set_text1("Bi-directional A star")
-                    output.set_text3(BI_A_STAR)
+                    output.set_text4(BI_A_STAR)
                     if len(weighted):
                         for node in weighted:
                             node.mark_weight()
@@ -320,7 +320,7 @@ def main(win, width):
                 elif algorithms[7].is_hover(pos):
                     algorithms[7].toggle_color()
                     output.set_text1("Bellman-Ford")
-                    output.set_text3(FLOYD)
+                    output.set_text4(FLOYD)
                     
                     if len(weighted):
                         for node in weighted:
@@ -346,7 +346,7 @@ def main(win, width):
 
                 elif mazes[0].is_hover(pos):
                     output.set_text1("DFS Maze")
-                    output.set_text3(DFS_GEN)
+                    output.set_text4(DFS_GEN)
                     output.set_text2("")
                     output.draw(win, BLACK)
                     pygame.display.update()
@@ -361,13 +361,17 @@ def main(win, width):
                                 node.reset()
                     maze_gen_dfs(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_button,
                              options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
-
+                    output.set_text1("Instructions")
+                    output.set_text2("")
+                    output.set_text3("")
+                    output.set_text4("""
+                     1. Pick source node\n
+                     2. Pick destination node\n
+                     3. Select the search algorithm.\n
+                     """)
                 elif mazes[1].is_hover(pos):
                     output.set_text1("Random Generation")
-                    output.set_text3(RANDOM)
+                    output.set_text4(RANDOM)
                     output.set_text2("......")
                     output.draw(win, BLACK)
                     pygame.display.update()
@@ -382,15 +386,24 @@ def main(win, width):
                                 node.reset()
                     maze_gen_random(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_button,
                                 options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
-                
+                    output.set_text1("")
+                    output.set_text2("")
+                    output.set_text3("")
+                    output.set_text4("""
+                     1. Pick source node\n
+                     2. Pick destination node\n
+                     3. Select the search algorithm.\n
+                     """)
                 
                 elif options[0].is_hover(pos):
-                    output.set_text1("1. Pick starting node")
-                    output.set_text2("2. Pick ending node")
-                    output.set_text3("3. Choose an algorithm")
+                    output.set_text1("")
+                    output.set_text2("")
+                    output.set_text3("")
+                    output.set_text4("""
+                     1. Pick source node\n
+                     2. Pick destination node\n
+                     3. Select the search algorithm.\n
+                     """)
                     output.draw(win, BLACK)
                     pygame.display.update()
                     weighted = []
@@ -433,6 +446,27 @@ def main(win, width):
                         grid = make_grid(ROWS, width)
                     output.set_label1(f"Number of rows: {ROWS}")
 
+            elif pygame.mouse.get_pressed()[1]:
+                pos = pygame.mouse.get_pos()
+                row, col = get_clicked_pos(pos, ROWS, width)
+                if row >= 0 and row < ROWS and col < ROWS and col >= 0:
+                    node = grid[row][col]
+                    if node in visited:
+                        visited.remove(node)
+                    if path:
+                        if node in path:
+                            path.remove(node)
+                    if not start and node != end:
+                        if node in visited:
+                            visited.remove(node)
+                        start = node
+                        start.make_start()
+                    elif not end and node != start:
+                        end = node
+                        end.make_end()
+                    elif node != end and node != start:
+                        node.make_weight()
+            
             elif pygame.mouse.get_pressed()[2]:
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)

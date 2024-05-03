@@ -24,7 +24,7 @@ class Node:
         self.dec_animation = False
         self.cooldown = 300
         self.distance = float('inf')
-
+        self.t = 0
     def set_distance(self, distance):
         self.distance = distance
 
@@ -156,6 +156,9 @@ def make_grid(rows, width):
             grid[i].append(node)
     return np.array(grid)
 
+def lerp_color(color1, color2, t):
+    return (int(color1[i] * (1 - t) + color2[i] * t) for i in range(3))
+
 
 def draw_grid(win, rows, width):
     gap = width // rows
@@ -163,7 +166,6 @@ def draw_grid(win, rows, width):
         pygame.draw.line(win, themes[theme_type]["grid_color"], (0, i*gap), (rows*gap, i*gap))
     for i in range(rows+1):
         pygame.draw.line(win, themes[theme_type]["grid_color"], (i*gap, 0), (i*gap, rows*gap))
-
 
 def get_clicked_pos(pos, rows, width):
     node_width = width//rows
