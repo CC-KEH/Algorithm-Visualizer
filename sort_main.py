@@ -57,7 +57,7 @@ def draw(draw_info, algorithms, back_button, sound_button, options, output, them
         draw_info.window.blit(sound_button["image"], sound_button["rect"])
         # Draw menu functions
         for algorithm in algorithms:
-            algorithm.draw(draw_info.window)
+            algorithm.draw(draw_info.window,theme_type=theme_type)
         
         text = font.render("Settings", 1, themes[theme_type]["heading_color"])
         but_height = ht//14.5
@@ -66,9 +66,9 @@ def draw(draw_info, algorithms, back_button, sound_button, options, output, them
         draw_info.window.blit(text, (width+delta//3 + 45, (end-top) + 1.1*top))
         
         for option in options:
-            option.draw(draw_info.window)
+            option.draw(draw_info.window,theme_type=theme_type)
             
-        output.draw(draw_info.window)
+        output.draw(draw_info.window,theme_type=theme_type)
     pygame.display.update()
 
 
@@ -140,7 +140,8 @@ def generate_list(n, min_val, max_val,uniform=False):
     return lst
 
 
-def main(window,theme_type='Default'):
+def main(window):
+    theme_type = 'Synth'
     w, ht = pygame.display.get_surface().get_size()
     width = ht #Sort Display
     delta = w - width
@@ -157,12 +158,13 @@ def main(window,theme_type='Default'):
     
     back_button = {}
     sound_button = {}
-    back_icon = pygame.image.load('assets/back_black.png')
     muted = False
     if theme_type == 'Default':
+        back_icon = pygame.image.load('assets/back_black.png')
         sound_icon = pygame.image.load('assets/black_sound_icon.png')
         mute_icon = pygame.image.load('assets/black_mute_icon.png')
     else:
+        back_icon = pygame.image.load('assets/back_white.png')
         sound_icon = pygame.image.load('assets/white_sound_icon.png')
         mute_icon = pygame.image.load('assets/white_mute_icon.png')
         
@@ -170,41 +172,41 @@ def main(window,theme_type='Default'):
     create_button(sound_button, sound_icon, ((1440), (900//40)/2.5))
     algorithms = [
         button(width+delta//4 +30, top_start + vertical_gap_factor,
-               but_width-but_height-20, but_height, 'Bubble Sort'),
+               but_width-but_height-20, but_height, text='Bubble Sort',theme_type=theme_type),
         
         button(width+delta//4+ 30, top_start + (2*vertical_gap_factor),
-               but_width-but_height-20, but_height, 'Selection Sort'),
+               but_width-but_height-20, but_height, text='Selection Sort',theme_type=theme_type),
 
         button(width+delta//4+ 30, top_start + (3*vertical_gap_factor),
-               but_width-but_height-20, but_height, 'Insertion Sort'),
+               but_width-but_height-20, but_height, text='Insertion Sort',theme_type=theme_type),
         
         button(width+delta//4+ 30, top_start + (4*vertical_gap_factor), 
-               but_width-but_height-20, but_height, 'Tim Sort'),
+               but_width-but_height-20, but_height, text='Tim Sort',theme_type=theme_type),
         
         button((width+delta//4 + horizontal_gap_factor+12),
-               top_start + vertical_gap_factor, but_width-but_height-20, but_height, "Merge Sort"),
+               top_start + vertical_gap_factor, but_width-but_height-20, but_height, text='Merge Sort',theme_type=theme_type),
 
         button((width+delta//4 + horizontal_gap_factor+12), top_start +
-                (2*vertical_gap_factor), but_width-but_height-20, but_height, 'Quick Sort'),
+                (2*vertical_gap_factor), but_width-but_height-20, but_height, text='Quick Sort',theme_type=theme_type),
 
         button((width+delta//4 + horizontal_gap_factor+12), top_start +
-               (3*vertical_gap_factor), but_width-but_height-20, but_height, 'Radix Sort'),
+               (3*vertical_gap_factor), but_width-but_height-20, but_height, text='Radix Sort',theme_type=theme_type),
    
         button((width+delta//4 + horizontal_gap_factor+12), top_start +
-               (4*vertical_gap_factor), but_width-but_height-20, but_height, 'Bucket Sort'),
+               (4*vertical_gap_factor), but_width-but_height-20, but_height, text='Bucket Sort',theme_type=theme_type),
     ]
     options_fst_hf_wdt = (but_width-but_height)//2
     options_sec_hf_st = (width+delta//4 + 30 + horizontal_gap_factor-20)
     options_sec_hf_wdt = (but_width-but_height-20)//3 + 1
     options_start_top = top_start + (8*vertical_gap_factor) + 2
     options = [
-        button(width+delta//4 + 30, options_start_top, options_fst_hf_wdt, but_height, "Generate"),
-        button(width+delta//4 + 30 +options_fst_hf_wdt,  options_start_top,   options_fst_hf_wdt, but_height, "Slow   "),
-        button(options_sec_hf_st, options_start_top, options_sec_hf_wdt, but_height, "Fast"),
-        button(options_sec_hf_st + options_sec_hf_wdt, options_start_top, options_sec_hf_wdt, but_height, "-"),
-        button(options_sec_hf_st + options_sec_hf_wdt*2, options_start_top, options_sec_hf_wdt, but_height, "+"),
-        button(width+delta//4 + 30, options_start_top + but_height+1, (but_width-but_height-20), but_height, "Reverse Order"),
-        button(options_sec_hf_st, options_start_top + but_height+1, (but_width-but_height-19), but_height, "Uniform Array"),
+        button(width+delta//4 + 30, options_start_top, options_fst_hf_wdt, but_height, text="Generate",theme_type=theme_type),
+        button(width+delta//4 + 30 + options_fst_hf_wdt,  options_start_top,   options_fst_hf_wdt, but_height, text="Slow   ",theme_type=theme_type),
+        button(options_sec_hf_st, options_start_top, options_sec_hf_wdt, but_height, text="Fast",theme_type=theme_type),
+        button(options_sec_hf_st + options_sec_hf_wdt, options_start_top, options_sec_hf_wdt, but_height, text="-",theme_type=theme_type),
+        button(options_sec_hf_st + options_sec_hf_wdt*2, options_start_top, options_sec_hf_wdt, but_height, text="+",theme_type=theme_type),
+        button(width+delta//4 + 30, options_start_top + but_height+1, (but_width-but_height-20), but_height, text="Reverse Order",theme_type=theme_type),
+        button(options_sec_hf_st, options_start_top + but_height+1, (but_width-but_height-19), but_height, text="Uniform Array",theme_type=theme_type),
     ]
     #* Result Screen
     sc_y_start = ht-240
@@ -262,7 +264,10 @@ def main(window,theme_type='Default'):
                     ascending = not ascending
                 
                 elif event.key == pygame.K_SPACE and not sorting:
-                    if sorting_algorithm == None:
+                    if sorting_algorithm_name == "Bucket Sort" and not is_uniform:
+                        output.set_error_message("Uniform Array Required")
+                        continue
+                    elif sorting_algorithm == None:
                         sorting_algorithm = bubble_sort
                         sorting_algorithm_name = 'Bubble Sort'
                         
@@ -290,7 +295,7 @@ def main(window,theme_type='Default'):
                     sorting_algorithm_name = 'Bubble Sort'
                     output.set_text1(sorting_algorithm_name)
                     output.set_text4(Bubble_Sort)
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                     
                 elif algorithms[1].is_hover(pos):
                     algorithms[1].toggle_color()
@@ -298,7 +303,7 @@ def main(window,theme_type='Default'):
                     sorting_algorithm_name = 'Selection Sort'
                     output.set_text1(sorting_algorithm_name)
                     output.set_text4(Selection_Sort)
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                 
                 elif algorithms[2].is_hover(pos):
                     algorithms[2].toggle_color()
@@ -306,7 +311,7 @@ def main(window,theme_type='Default'):
                     sorting_algorithm_name = 'Insertion Sort'
                     output.set_text1(sorting_algorithm_name)
                     output.set_text4(Insertion_Sort)
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                     
                 elif algorithms[3].is_hover(pos):
                     algorithms[3].toggle_color()
@@ -314,16 +319,16 @@ def main(window,theme_type='Default'):
                     sorting_algorithm_name = 'Tim Sort'
                     output.set_text1(sorting_algorithm_name)
                     output.set_text4(Tim_Sort)
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
 
                 elif algorithms[4].is_hover(pos):
                     algorithms[4].toggle_color()
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                     sorting_algorithm = merge_sort
                     sorting_algorithm_name = 'Merge Sort'
                     output.set_text1(sorting_algorithm_name)
                     output.set_text4(Merge_Sort)
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                     
                 elif algorithms[5].is_hover(pos):
                     algorithms[5].toggle_color()
@@ -331,7 +336,7 @@ def main(window,theme_type='Default'):
                     sorting_algorithm_name = 'Quick Sort'
                     output.set_text1(sorting_algorithm_name)
                     output.set_text4(Quick_Sort)
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                     
                 elif algorithms[6].is_hover(pos):
                     algorithms[6].toggle_color()
@@ -339,7 +344,7 @@ def main(window,theme_type='Default'):
                     sorting_algorithm_name = 'Radix Sort'
                     output.set_text1(sorting_algorithm_name)
                     output.set_text4(Radix_Sort)
-                    output.draw(draw_info.window, BLACK)
+                    output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
 
                 elif algorithms[7].is_hover(pos):
                     algorithms[7].toggle_color()
@@ -348,13 +353,13 @@ def main(window,theme_type='Default'):
                         sorting_algorithm_name = 'Bucket Sort'
                         output.set_text1(sorting_algorithm_name)
                         output.set_text4(Bucket_Sort)
-                        output.draw(draw_info.window, BLACK)
+                        output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                     else:
                         sorting_algorithm_name = 'Bucket Sort'
                         output.set_text1(sorting_algorithm_name)
                         output.set_text4("")
                         output.set_error_message("Uniform Array Required")
-                        output.draw(draw_info.window, BLACK)
+                        output.draw(draw_info.window,theme_type=theme_type,outline=BLACK)
                                         
                 elif options[0].is_hover(pos):
                     options[0].toggle_color()

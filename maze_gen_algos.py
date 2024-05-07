@@ -12,7 +12,7 @@ def make_black(grid, win):
             node.draw(win)
     pygame.display.update()
 
-def maze_gen_dfs(draw, width, grid, start, end, left, right, top, bottom, win, vertical=True):
+def maze_gen_dfs(draw, width, grid, start, end, left, right, top, bottom, win, theme_type, vertical=True):
     make_black(grid, win)
     x, y = 1, 1
     head = grid[x][y]
@@ -27,14 +27,14 @@ def maze_gen_dfs(draw, width, grid, start, end, left, right, top, bottom, win, v
             head.looking_at()
             stack.append((x, y))
             head.draw(win)
-            draw_grid(win, len(grid), width)
+            draw_grid(win, len(grid), width,theme_type)
             pygame.display.update()
         else:
             if len(stack) > 0:
                 x, y = stack.pop()
                 grid[x][y].reset()
                 grid[x][y].draw(win)
-                draw_grid(win, len(grid), width)
+                draw_grid(win, len(grid), width,theme_type)
                 pygame.display.update()
             if len(stack) > 0:
                 x, y = stack[-1]
@@ -42,7 +42,7 @@ def maze_gen_dfs(draw, width, grid, start, end, left, right, top, bottom, win, v
             else:
                 break
 
-def maze_gen_random(draw, width, grid, start, end, left, right, top, bottom, win, vertical=True):
+def maze_gen_random(draw, width, grid, start, end, left, right, top, bottom, win, theme_type, vertical=True):
     make_black(grid,win)
     for row in range(len(grid)):
         for col in range(len(grid)):
@@ -52,7 +52,7 @@ def maze_gen_random(draw, width, grid, start, end, left, right, top, bottom, win
                 head.looking_at()
                 head.draw(win)
                 grid[col][row].reset()
-                draw_grid(win, len(grid), width)
+                draw_grid(win, len(grid), width,theme_type)
         
             pygame.display.update()
 

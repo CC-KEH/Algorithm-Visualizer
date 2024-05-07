@@ -1,6 +1,9 @@
 from themes.colors import *
 import numpy as np
 import simpleaudio as sa
+from grid import *
+from system import *
+
 def h_score(p1, p2):
     """Calculate heuristic using Manhattan distance
 
@@ -30,4 +33,44 @@ def play_sound(frequency, duration=0.01):
     audio = audio.astype(np.int16)
     play_obj = sa.play_buffer(audio, 1, 2, sample_rate)
     play_obj.wait_done()
+
+
+def prepare_for_search(weighted,start,end,grid,algorithm,algorithms,index):
+    if len(weighted):
+        for node in weighted:
+            node.mark_weight()
+            
+    if start and end:
+        for row in grid:
+            for node in row:
+                node.update_neighbors(grid)
+                if not node.is_neutral() and node != start and node != end and not node.is_barrier() and not node.is_weight():
+                    node.reset()
+                    
+        search_algorithm = algorithm
+                        
+        algorithms[index].toggle_color()
+        
+        return search_algorithm
     
+def prepare_for_maze(algorithm,output,win,grid,ROWS,width,algorithms,mazes,back_button,options,theme_type):
+    start = None
+    end = None
+    visited = []
+    path = []
+    weighted = []
+    for row in grid:
+        for node in row:
+            if node.is_barrier() or node.is_start() or node.is_end():
+                node.reset()
+    output.set_text1("Instructions")
+    output.set_text2("")
+    output.set_text3("")
+    output.set_text4("""
+     1. Pick source node\n
+     2. Pick destination node\n
+     3. Select the search algorithm.\n
+     """)
+    maze_gen_algorithm = algorithm(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_button,
+             options, output), width, grid, start, end, 0, ROWS, 0, ROWS, win,theme_type)
+    return maze_gen_algorithm

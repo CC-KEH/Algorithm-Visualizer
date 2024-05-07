@@ -44,7 +44,7 @@ Dijkstra Search
 A* Search
 IDA* Search
 Bi-A* Search
-Floyd Warshall Search
+Bellman-Ford Search
 """
 
 # Split the information into lines

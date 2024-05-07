@@ -8,7 +8,7 @@ import numpy as np
 
 SCALE_FACTOR = 30
 
-def reconstruct_path(came_from, start, current, draw, visited,  win, width,theme_type, grid,is_draw = True): 
+def reconstruct_path(came_from, start, current, draw, visited,  win, width, theme_type, grid, is_draw = True): 
     path = []
     c = 0
     while current in came_from:
@@ -27,11 +27,11 @@ def reconstruct_path(came_from, start, current, draw, visited,  win, width,theme
             for rows in grid:
                 for node in rows:
                     node.draw(win)
-            draw_grid(win, len(grid), width)
+            draw_grid(win, len(grid), width,theme_type)
             pygame.display.update()
     return path, c-1
         
-def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
+def maze_bfs(draw,grid,start,end,output, win, width,theme_type,muted):
     queue = [start]
     visited = [start]
     came_from = {}
@@ -46,10 +46,17 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
         if current == end:
             path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
             start.make_start()
-            output.set_text1(f"Path Length: {inc}")
-            output.set_text2(f"#Visited nodes: {vis}")
+            output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             """)
+            
             if vis != 0:
-                output.set_text3(f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             3. Efficiency: {np.round(inc/vis, decimals=3)}
+                             """)
             return visited, path
         c = 1
         
@@ -61,16 +68,24 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
                 if(neighbor == end): 
                     path,inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
                     start = start.make_start()
-                    output.set_text1(f"Path Length: {inc}")
-                    output.set_text2(f"#Visited nodes: {vis}")
+                    output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             """)
+                    
                     if vis != 0:
-                        output.set_text3(f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                        output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             3. Efficiency: {np.round(inc/vis, decimals=3)}
+                             """)
                     return visited, path
                 queue.append(neighbor)
                 visited.append(neighbor)
                 neighbor.make_open()   
                 distance = h_score(neighbor.get_pos(), end.get_pos())
-                play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
+                if not muted:
+                    play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
         if current != start:
             vis+=c
@@ -81,12 +96,12 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width)
+        draw_grid(win, len(grid), width,theme_type)
         pygame.display.update()
             
     return visited, False
 
-def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
+def maze_dfs(draw, grid, start, end, output, win, width,theme_type,muted):
     stack = [start]
     visited = [start]
     came_from = {}
@@ -104,11 +119,16 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
         if current == end:
             path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
             start.make_start()
-            output.set_text1(f"Path Length: {inc}")
-            output.set_text2(f"#Visited nodes: {vis}")
+            output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             """)
             if vis != 0:
-                output.set_text3(
-                    f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             3. Efficiency: {np.round(inc/vis, decimals=3)}
+                             """)
             return visited, path
         c = 1
         for neighbor in current.neighbors:
@@ -122,11 +142,16 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
                 if (neighbor == end):
                     path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
                     start = start.make_start()
-                    output.set_text1(f"Path Length: {inc}")
-                    output.set_text2(f"#Visited nodes: {vis}")
+                    output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             """)
                     if vis != 0:
-                        output.set_text3(
-                            f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                        output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             3. Efficiency: {np.round(inc/vis, decimals=3)}
+                             """)
                     return visited, path
 
         if current != start:
@@ -138,12 +163,12 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width)
+        draw_grid(win, len(grid), width,theme_type)
         pygame.display.update()
 
     return visited, False
 
-def maze_dijkstra(draw, grid, start, end, output, win, width,theme_type):
+def maze_dijkstra(draw, grid, start, end, output, win, width,theme_type,muted):
     visited_list = []
     came_from = {}
     distances = {node: float('inf') for row in grid for node in row}
@@ -163,11 +188,16 @@ def maze_dijkstra(draw, grid, start, end, output, win, width,theme_type):
                 came_from, start, end, draw, visited_list, win, width, theme_type,grid)
             start.make_start()
             end.make_end()
-            output.set_text1(f"Path Length: {inc}")
-            output.set_text2(f"#Visited nodes: {len(visited_list)}")
+            output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {len(visited_list)}
+                             """)
             if len(visited_list) != 0:
-                output.set_text3(
-                    f"Efficiency: {np.round(inc / len(visited_list), decimals=3)}")
+                output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {len(visited_list)}
+                             3. Efficiency: {np.round(inc/len(visited_list), decimals=3)}
+                             """)
             # Send visited_list to visit_animation
             visit_animation(visited_list,theme_type)
             return visited_list, path
@@ -200,12 +230,12 @@ def maze_dijkstra(draw, grid, start, end, output, win, width,theme_type):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width)
+        draw_grid(win, len(grid), width,theme_type)
         pygame.display.update()
 
     return visited_list, False
 
-def maze_astar(draw, grid, start, end, output, win, width,theme_type):
+def maze_astar(draw, grid, start, end, output, win, width,theme_type,muted):
     count = 0
     vis = 0
     open_set = PriorityQueue()
@@ -231,10 +261,16 @@ def maze_astar(draw, grid, start, end, output, win, width,theme_type):
         if current == end:
             path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
             start.make_start()
-            output.set_text1(f"Path Length: {inc}")
-            output.set_text2(f"#Visited nodes: {vis}")
+            output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}
+                             """)
             if vis != 0:
-                output.set_text3(f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}\n
+                             3. Efficiency: {np.round(inc/vis, decimals=3)}
+                             """)
             return visited, path
         c = 1      
         for neighbor in current.neighbors:
@@ -264,7 +300,7 @@ def maze_astar(draw, grid, start, end, output, win, width,theme_type):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width)
+        draw_grid(win, len(grid), width,theme_type)
         pygame.display.update()
             
     return False
@@ -299,10 +335,16 @@ def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold
             if current == end:
                 path, inc = reconstruct_path(came_from, start, end, draw, visited, win, width, theme_type,grid)
                 start.make_start()
-                output.set_text1(f"Path Length: {inc}")
-                output.set_text2(f"#Visited nodes: {vis}")
+                output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}\n
+                             """)
                 if vis != 0:
-                    output.set_text3(f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                    output.set_text4(f"""
+                             1. Path Length: {inc}\n
+                             2. Visited nodes: {vis}\n
+                             3. Efficiency: {np.round(inc/vis, decimals=3)}
+                             """)
                 return visited, path
             
             c = 1
@@ -332,7 +374,7 @@ def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold
             for rows in grid:
                 for node in rows:
                     node.draw(win)
-            draw_grid(win, len(grid), width)
+            draw_grid(win, len(grid), width,theme_type)
             pygame.display.update()
             
         if visited == visited_old:
@@ -369,16 +411,19 @@ def maze_bellman_ford(draw, grid, start, end, output, win, width, theme_type):
     path, inc = reconstruct_path(came_from, start, end, draw, nodes, win, width, theme_type, grid)
     start.make_start()
     end.make_end()
-    output.set_text1(f"Path Length: {inc}")
-    output.set_text2(f"#Visited nodes: {len(nodes)}")
+    output.set_text4(f"""
+                    1. Path Length: {inc}\n
+                    2. Visited nodes: {len(nodes)}\n
+                    """)
     if len(nodes) != 0:
-        output.set_text3(f"Efficiency: {np.round(inc / len(nodes), decimals=3)}")
+        output.set_text4(f"""
+                        1. Path Length: {inc}\n
+                        2. Visited nodes: {len(nodes)}\n
+                        3. Efficiency: {np.round(inc/len(nodes), decimals=3)}
+                        """)
     visit_animation(nodes, theme_type)
 
     return nodes, path
-
-def maze_jump_point(draw, grid, start, end, is_bidirectional=False):
-    pass
 
 def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_target=False):
     count = 0
@@ -419,7 +464,7 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                 for rows in grid:
                     for node in rows:
                         node.draw(win)
-                        draw_grid(win, len(grid), width)
+                        draw_grid(win, len(grid), width,theme_type)
                         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -450,7 +495,7 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                             neighbor.make_open()
                 elif neighbor != start and neighbor not in v1:
                     neighbor.color = (254, 102, 1)
-                    draw_grid(win, len(grid), width)
+                    draw_grid(win, len(grid), width,theme_type)
                     pygame.display.update()
                     came_from_start[neighbor] = current
                     path1, inc1 = reconstruct_path(
@@ -459,11 +504,17 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                     path2, inc2 = reconstruct_path(
                         came_from_end, end, neighbor, draw, visited1, win, width, theme_type,grid)
                     end.make_end()
-                    output.set_text1(f"Path Length: {inc1+inc2+1}")
-                    output.set_text2(f"#Visited nodes: {vis}")
+                    output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        """)
+
                     if vis != 0:
-                        output.set_text3(
-                            f"Efficiency: {np.round((inc1+inc2+1+1)/vis, decimals=3)}")
+                        output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc1+inc2+1/vis, decimals=3)}
+                        """)
                     return visited1+visited2, path1+path2
         if current != start:
             if current in visited1:
@@ -477,7 +528,7 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width)
+        draw_grid(win, len(grid), width,theme_type)
         pygame.display.update()
         if not lock:
             current = open_set_end.get()[2]
@@ -505,7 +556,7 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                                 neighbor.make_open()
                     elif neighbor != end and neighbor not in v2:
                         neighbor.color = (254, 102, 1)
-                        draw_grid(win, len(grid), width)
+                        draw_grid(win, len(grid), width,theme_type)
                         pygame.display.update()
                         came_from_end[neighbor] = current
                         path1, inc1 = reconstruct_path(
@@ -514,11 +565,16 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                         path2, inc2 = reconstruct_path(
                             came_from_start, start, neighbor, draw, visited2, win, width, theme_type,grid)
                         start.make_start()
-                        output.set_text1(f"Path Length: {inc1+inc2+1}")
-                        output.set_text2(f"#Visited nodes: {vis}")
+                        output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        """)
                         if vis != 0:
-                            output.set_text3(
-                                f"Efficiency: {np.round((inc1+inc2+1)/vis, decimals=3)}")
+                            output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc1+inc2+1/vis, decimals=3)}
+                        """)
                         return visited2+visited1, path1+path2
 
             if current != end:
@@ -533,12 +589,12 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
             for rows in grid:
                 for node in rows:
                     node.draw(win)
-            draw_grid(win, len(grid), width)
+            draw_grid(win, len(grid), width,theme_type)
             pygame.display.update()
 
     return visited2+visited1, False
 
-def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type):
+def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type,muted):
     queue1 = [start]
     queue2 = [end]
     visited1 = [start]
@@ -562,11 +618,16 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type):
                 came_from2, end, current1, draw, visited2, win, width, theme_type,grid)
             end.make_end()
             current1.make_path()
-            output.set_text1(f"Path Length: {inc1+inc2+1}")
-            output.set_text2(f"#Visited nodes: {vis}")
+            output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        """)
             if vis != 0:
-                output.set_text3(
-                    f"Efficiency: {np.round(inc1+inc2+1+1/vis, decimals=3)}")
+                output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc1+inc2+1/vis, decimals=3)}
+                        """)
             return visited2+visited1, path1+path2
 
         elif (current2 in visited1):
@@ -577,33 +638,48 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type):
                 came_from2, end, current2, draw, visited2, win, width, theme_type,grid)
             end.make_end()
             current2.make_path()
-            output.set_text1(f"Path Length: {inc1+inc2+1}")
-            output.set_text2(f"#Visited nodes: {vis}")
+            output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        """)
             if vis != 0:
-                output.set_text3(
-                    f"Efficiency: {np.round(inc1+inc2+1+1/vis, decimals=3)}")
+                output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc1+inc2+1/vis, decimals=3)}
+                        """)
             return visited1+visited2, path1 + path2
 
         if current1 == end:
             path, inc = reconstruct_path(
                 came_from1, start, end, draw, visited1, win, width, theme_type,grid)
             start.make_start()
-            output.set_text1(f"Path Length: {inc}")
-            output.set_text2(f"#Visited nodes: {vis}")
+            output.set_text4(f"""
+                        1. Path Length: {inc1+inc2+1}\n
+                        2. Visited nodes: {vis}\n
+                        """)
             if vis != 0:
-                output.set_text3(
-                    f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                output.set_text4(f"""
+                    1. Path Length: {inc}\n
+                    2. Visited nodes: {vis}\n
+                    3. Efficiency: {np.round(inc/vis, decimals=3)}
+                    """)
             return visited1, path
 
         elif current2 == start:
             path, inc = reconstruct_path(
                 came_from1, start, end, draw, visited2, win, width, theme_type,grid)
             start.make_start()
-            output.set_text1(f"Path Length: {inc}")
-            output.set_text2(f"#Visited nodes: {vis}")
+            output.set_text4(f"""
+                        1. Path Length: {inc}\n
+                        2. Visited nodes: {vis}\n
+                        """)
             if vis != 0:
-                output.set_text3(
-                    f"Efficiency: {np.round(inc/vis, decimals=3)}")
+                output.set_text4(f"""
+                        1. Path Length: {inc}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc/vis, decimals=3)}
+                        """)
             return visited2, path
 
         c = 1
@@ -617,11 +693,17 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type):
                         path1, inc1 = reconstruct_path(
                             came_from1, start, end, draw, visited1, win, width, theme_type,grid)
                         start.make_start()
-                        output.set_text1(f"Path Length: {inc1}")
-                        output.set_text2(f"#Visited nodes: {vis}")
+                        output.set_text4(f"""
+                        1. Path Length: {inc1}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc1/vis, decimals=3)}
+                        """)
                         if vis != 0:
-                            output.set_text3(
-                                f"Efficiency: {np.round(inc1/vis, decimals=3)}")
+                            output.set_text4(f"""
+                        1. Path Length: {inc1}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc1/vis, decimals=3)}
+                        """)
                         return visited1, path1
                     queue1.append(neighbor)
                     visited1.append(neighbor)
@@ -636,11 +718,16 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type):
                         path2, inc2 = reconstruct_path(
                             came_from1, start, end, draw, visited2, win, width, theme_type,grid)
                         start.make_start()
-                        output.set_text1(f"Path Length: {inc2}")
-                        output.set_text2(f"#Visited nodes: {vis}")
+                        output.set_text4(f"""
+                        1. Path Length: {inc2}\n
+                        2. Visited nodes: {vis}\n
+                        """)
                         if vis != 0:
-                            output.set_text3(
-                                f"Efficiency: {np.round(inc2/vis, decimals=3)}")
+                            output.set_text4(f"""
+                        1. Path Length: {inc2}\n
+                        2. Visited nodes: {vis}\n
+                        3. Efficiency: {np.round(inc2/vis, decimals=3)}
+                        """)
                         return visited2, path2
                     queue2.append(neighbor)
                     visited2.append(neighbor)
@@ -653,7 +740,7 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width)
+        draw_grid(win, len(grid), width,theme_type)
         pygame.display.update()
 
         if current2 != end:
@@ -663,7 +750,7 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width)
+        draw_grid(win, len(grid), width,theme_type)
         pygame.display.update()
 
     return visited1+visited2, False

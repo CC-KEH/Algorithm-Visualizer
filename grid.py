@@ -7,10 +7,9 @@ WIDTH = 800
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
 pygame.display.set_caption("Path Finding Visualizer")
 
-theme_type = "Default"
 
 class Node:
-    def __init__(self, row, col, width, total_rows):
+    def __init__(self, row, col, width, total_rows,theme_type):
         self.last = pygame.time.get_ticks()
         self.row = row
         self.col = col
@@ -25,6 +24,8 @@ class Node:
         self.cooldown = 300
         self.distance = float('inf')
         self.t = 0
+        self.theme_type = theme_type
+        
     def set_distance(self, distance):
         self.distance = distance
 
@@ -35,71 +36,71 @@ class Node:
         return self.row, self.col
 
     def is_visited(self):
-        return self.color == themes[theme_type]["closed_color"]
+        return self.color == themes[self.theme_type]["closed_color"]
 
     def is_open(self):
-        return self.color == themes[theme_type]["open_color"]
+        return self.color == themes[self.theme_type]["open_color"]
 
     def is_barrier(self):
-        return self.color == themes[theme_type]["barrier_color"]
+        return self.color == themes[self.theme_type]["barrier_color"]
 
     def is_weight(self):
         return self.weight
 
     def is_start(self):
-        return self.color == themes[theme_type]["start_color"]
+        return self.color == themes[self.theme_type]["start_color"]
 
     def is_end(self):
-        return self.color == themes[theme_type]["end_color"]
+        return self.color == themes[self.theme_type]["end_color"]
 
     def is_neutral(self):
-        return self.color == themes[theme_type]["plane_color"]
+        return self.color == themes[self.theme_type]["plane_color"]
 
     def is_looked(self):
-        return self.color == themes[theme_type]["look_color"]
+        return self.color == themes[self.theme_type]["look_color"]
 
     def reset(self):
-        self.color = themes[theme_type]["plane_color"]
+        self.color = themes[self.theme_type]["plane_color"]
         self.weight = False
 
     def make_visit(self):
         if not self.is_weight():
-            self.color = themes[theme_type]["closed_color_2"]
+            self.color = themes[self.theme_type]["closed_color_2"]
         else:
-            self.color = themes[theme_type]["closed_color_3"]
+            self.color = themes[self.theme_type]["closed_color_3"]
 
     def make_open(self):
         if not self.is_weight():
-            self.color = themes[theme_type]["open_color_1"]
+            self.color = themes[self.theme_type]["open_color_1"]
         else:
-            self.color = themes[theme_type]["open_color_2"]
+            self.color = themes[self.theme_type]["open_color_2"]
 
     def make_start(self):
-        self.color = themes[theme_type]["start_color"]
+        self.color = themes[self.theme_type]["start_color"]
         self.weight = False
 
     def make_barrier(self):
         if not self.is_start() and not self.is_end():
-            self.color = themes[theme_type]["barrier_color"]
+            self.color = themes[self.theme_type]["barrier_color"]
             self.weight = False
 
     def make_weight(self):
         if not self.is_start() and not self.is_end():
-            self.color = themes[theme_type]["weight_color"]
+            self.color = themes[self.theme_type]["weight_color"]
             self.weight = True
 
     def make_end(self):
-        self.color = themes[theme_type]["end_color"]
+        self.color = themes[self.theme_type]["end_color"]
         self.weight = False
 
     def make_path(self):
         if not self.is_weight():
-            self.color = themes[theme_type]["path_color_1"]
+            self.color = themes[self.theme_type]["path_color_1"]
         else:
-            self.color = themes[theme_type]["path_color_2"]
+            self.color = themes[self.theme_type]["path_color_2"]
 
     def looking_at(self):
-        self.color = themes[theme_type]["look_color"]
+        self.color = themes[self.theme_type]["look_color"]
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.width))
@@ -135,24 +136,24 @@ class Node:
     def __lt__(self, other):
         return False
 
-def make_grid(rows, width):
+def make_grid(rows, width,theme_type):
     grid = []
     node_width = width // rows
     for i in range(rows):
         grid.append([]) 
         for j in range(rows):
-            node = Node(i, j, node_width, rows)
+            node = Node(i, j, node_width, rows,theme_type=theme_type)
             grid[i].append(node)
     return grid
 
 
-def make_grid(rows, width):
+def make_grid(rows, width,theme_type):
     grid = []
     gap = width // rows
     for i in range(rows):
         grid.append([])
         for j in range(rows):
-            node = Node(i, j, gap, rows)
+            node = Node(i, j, gap, rows,theme_type=theme_type)
             grid[i].append(node)
     return np.array(grid)
 
@@ -160,7 +161,7 @@ def lerp_color(color1, color2, t):
     return (int(color1[i] * (1 - t) + color2[i] * t) for i in range(3))
 
 
-def draw_grid(win, rows, width):
+def draw_grid(win, rows, width, theme_type):
     gap = width // rows
     for i in range(rows+1):
         pygame.draw.line(win, themes[theme_type]["grid_color"], (0, i*gap), (rows*gap, i*gap))
