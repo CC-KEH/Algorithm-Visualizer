@@ -8,7 +8,7 @@ from maze_gen_algos import *
 from gen_info import *
 from search_info import *
 import main_app
-
+ICON_SIZE = (50,50)
 
 def main(win, width):
     theme_type = 'Synth'
@@ -27,8 +27,26 @@ def main(win, width):
 
     # Define your button
     back_button = {}
-    back_icon = pygame.image.load('assets/back_black.png')
+    sound_button = {}
+    mode_button = {}
+    if theme_type == 'Default':
+        back_icon = pygame.image.load('assets/black_back.png')
+        day_icon = pygame.image.load('assets/black_sun.png')
+        # night_icon = pygame.image.load('assets/black_moon.png')
+        sound_icon = pygame.image.load('assets/black_sound_icon.png')
+        mute_icon = pygame.image.load('assets/black_mute_icon.png')
+    
+    else:
+        back_icon = pygame.image.load('assets/white_back.png')
+        # day_icon = pygame.image.load('assets/white_sun.png')
+        night_icon = pygame.image.load('assets/white_moon.png')
+        sound_icon = pygame.image.load('assets/white_sound.png')
+        mute_icon = pygame.image.load('assets/white_mute.png')
+        
     create_button(back_button,back_icon,((820), (ht//40)/2.5))
+    create_button(mode_button, day_icon, ((1340), (ht//40)/2.5))
+    create_button(sound_button, sound_icon, ((1440), (ht//40)/2.5))
+    
     algorithms = [
         button(width + start_factor, top_start + vertical_gap_factor,
                but_width-but_height, but_height, text='BFS',theme_type=theme_type),
@@ -101,7 +119,7 @@ def main(win, width):
         if path:
             path_animation(path,theme_type)
 
-        draw(win, grid, ROWS, width, algorithms, mazes,back_button, options, output, theme_type)
+        draw(win, grid, ROWS, width, algorithms, mazes,back_button,mode_button,sound_button, options, output, theme_type)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -161,7 +179,21 @@ def main(win, width):
                 elif is_hover(back_button,pos):
                     print("Sending to Main Menu")
                     main_app.main_menu()
+                
+                if is_hover(sound_button,pos):
+                    muted = not muted
+                    if muted:
+                        sound_button["image"] = mute_icon
+                    else:
+                        sound_button["image"] = sound_icon
                     
+                if is_hover(mode_button,pos):
+                    theme_type = 'Default' if theme_type == 'Synth' else 'Synth'
+                    if theme_type == 'Default':
+                        mode_button["image"] = day_icon
+                    else:
+                        mode_button["image"] = night_icon
+                
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
                     output.set_text1("Breath First Search")

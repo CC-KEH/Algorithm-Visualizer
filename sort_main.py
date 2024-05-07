@@ -16,7 +16,7 @@ SIDE_PADDING = 40  # 50 on left and 50 on right
 TOP_PADDING = 150
 FONT = pygame.font.SysFont("comicsans", 20)
 LARGE_FONT = pygame.font.SysFont("comicsans", 40)
-
+ICON_SIZE = (50,50)
 
 class DrawInformation:
     def __init__(self, width, height, lst, window, color=BG_COLOR):
@@ -36,7 +36,7 @@ class DrawInformation:
         self.bar_height = math.floor((self.height - TOP_PADDING) / (list_range))
         self.start_x = SIDE_PADDING // 2
 
-def draw(draw_info, algorithms, back_button, sound_button, options, output, theme_type, menu=True,is_uniform=False):
+def draw(draw_info, algorithms, back_button, mode_button, sound_button, options, output, theme_type, ascending, menu=True,is_uniform=False):
     draw_info.window.fill(themes[theme_type]['plane_color'])
     # Draw sorting visualizer
     draw_list(draw_info,theme_type=theme_type,is_uniform=is_uniform)
@@ -54,6 +54,7 @@ def draw(draw_info, algorithms, back_button, sound_button, options, output, them
         end = ht//40
         draw_info.window.blit(back_button["image"], back_button["rect"])
         draw_info.window.blit(text, ((width+delta//3.7), (end-top)/2.5))
+        draw_info.window.blit(mode_button["image"], mode_button["rect"])
         draw_info.window.blit(sound_button["image"], sound_button["rect"])
         # Draw menu functions
         for algorithm in algorithms:
@@ -66,6 +67,12 @@ def draw(draw_info, algorithms, back_button, sound_button, options, output, them
         draw_info.window.blit(text, (width+delta//3 + 45, (end-top) + 1.1*top))
         
         for option in options:
+            if option.text=='Ascending' or option.text=='Descending':
+                option.text=f"{'Ascending' if ascending else 'Descending'}"
+            
+            if option.text=='Uniform Array' or option.text=='Non-Uniform Array':
+                option.text=f"{'Uniform Array' if is_uniform else 'Non-Uniform Array'}"
+            
             option.draw(draw_info.window,theme_type=theme_type)
             
         output.draw(draw_info.window,theme_type=theme_type)
@@ -141,9 +148,9 @@ def generate_list(n, min_val, max_val,uniform=False):
 
 
 def main(window):
-    theme_type = 'Synth'
+    theme_type = 'Default'
     w, ht = pygame.display.get_surface().get_size()
-    width = ht #Sort Display
+    width = ht
     delta = w - width
     
     n = 50
@@ -158,18 +165,25 @@ def main(window):
     
     back_button = {}
     sound_button = {}
+    mode_button = {}
     muted = False
-    if theme_type == 'Default':
-        back_icon = pygame.image.load('assets/back_black.png')
-        sound_icon = pygame.image.load('assets/black_sound_icon.png')
-        mute_icon = pygame.image.load('assets/black_mute_icon.png')
-    else:
-        back_icon = pygame.image.load('assets/back_white.png')
-        sound_icon = pygame.image.load('assets/white_sound_icon.png')
-        mute_icon = pygame.image.load('assets/white_mute_icon.png')
-        
-    create_button(back_button, back_icon, ((1020), (900//40)/2.5))
-    create_button(sound_button, sound_icon, ((1440), (900//40)/2.5))
+    ascending = True
+    
+    black_back_icon = pygame.image.load('assets/black_back.png')
+    black_day_icon = pygame.image.load('assets/black_sun.png')
+    black_sound_icon = pygame.image.load('assets/black_sound.png')
+    black_mute_icon = pygame.image.load('assets/black_mute.png')
+    
+    white_back_icon = pygame.image.load('assets/white_back.png')
+    white_night_icon = pygame.image.load('assets/white_moon.png')
+    white_sound_icon = pygame.image.load('assets/white_sound.png')
+    white_mute_icon = pygame.image.load('assets/white_mute.png')
+    
+    
+    create_button(back_button, white_back_icon, ((1020), (900//40)/2.5))
+    create_button(mode_button, black_day_icon, ((1370), (900//40)/2.5))
+    create_button(sound_button, white_sound_icon, ((1440), (900//40)/2.5))
+    
     algorithms = [
         button(width+delta//4 +30, top_start + vertical_gap_factor,
                but_width-but_height-20, but_height, text='Bubble Sort',theme_type=theme_type),
@@ -205,7 +219,7 @@ def main(window):
         button(options_sec_hf_st, options_start_top, options_sec_hf_wdt, but_height, text="Fast",theme_type=theme_type),
         button(options_sec_hf_st + options_sec_hf_wdt, options_start_top, options_sec_hf_wdt, but_height, text="-",theme_type=theme_type),
         button(options_sec_hf_st + options_sec_hf_wdt*2, options_start_top, options_sec_hf_wdt, but_height, text="+",theme_type=theme_type),
-        button(width+delta//4 + 30, options_start_top + but_height+1, (but_width-but_height-20), but_height, text="Reverse Order",theme_type=theme_type),
+        button(width+delta//4 + 30, options_start_top + but_height+1, (but_width-but_height-20), but_height, text=f"{'Ascending' if ascending else 'Descending'}",theme_type=theme_type),
         button(options_sec_hf_st, options_start_top + but_height+1, (but_width-but_height-19), but_height, text="Uniform Array",theme_type=theme_type),
     ]
     #* Result Screen
@@ -217,7 +231,6 @@ def main(window):
     
     draw_info = DrawInformation(width + 150, width, lst, window)
     sorting = False
-    ascending = True
     sorting_algorithm = None
     sorting_algorithm_name = ""
     sorting_algorithm_generator = None
@@ -245,9 +258,9 @@ def main(window):
             except StopIteration:
                 sorting = False
         if is_uniform:  
-            draw(draw_info,algorithms,back_button,sound_button,options,output,theme_type,is_uniform=True)        
+            draw(draw_info,algorithms,back_button,mode_button,sound_button,options,output,theme_type,ascending=ascending,is_uniform=True)  
         else: 
-            draw(draw_info,algorithms,back_button,sound_button,options,output,theme_type)        
+            draw(draw_info,algorithms,back_button,mode_button,sound_button,options,output,theme_type,ascending=ascending,is_uniform=False)        
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -285,10 +298,17 @@ def main(window):
                 if is_hover(sound_button,pos):
                     muted = not muted
                     if muted:
-                        sound_button["image"] = mute_icon
+                        sound_button["image"] = black_mute_icon if theme_type == 'Default' else white_mute_icon
                     else:
-                        sound_button["image"] = sound_icon
-                    
+                        sound_button["image"] = black_sound_icon if theme_type == 'Default' else white_sound_icon
+                
+                if is_hover(mode_button,pos):
+                    theme_type = 'Default' if theme_type == 'Synth' else 'Synth'
+                    if theme_type == 'Default':
+                        mode_button["image"] = black_day_icon
+                    else:
+                        mode_button["image"] = white_night_icon
+                
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
                     sorting_algorithm = bubble_sort

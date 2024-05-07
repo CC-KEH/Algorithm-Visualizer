@@ -63,7 +63,7 @@ class screen():
         
     def set_label1(self, label):
         self.label1 = label
-    
+
     def set_text1(self, text):
         self.text1 = text
         
@@ -97,7 +97,7 @@ class screen():
         if self.text1 != '':
             font = pygame.font.SysFont('verdana', 30)
             text = font.render(self.text1, 1, (0,0,0))
-            win.blit(text, (self.x + (self.width/2 - text.get_width()/2)+15, self.y + (self.height/2 - text.get_height()/2) - 80))
+            win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2) - 80))
         
         if self.text2 != '':
             font = pygame.font.SysFont('verdana', 30)
@@ -141,7 +141,7 @@ def is_hover(button, pos):
     else:
         return False
 
-def draw(win, grid, rows, width, algorithms, mazes,back_button, options, output,theme_type, menu = True):
+def draw(win, grid, rows, width, algorithms, mazes,back_button,mode_button,sound_button, options, output,theme_type, menu = True):
     win.fill(themes[theme_type]["menu_bg_color"])
     for row in grid:
         for node in row:
@@ -159,6 +159,8 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button, options, output,
         end = ht//40
         win.blit(back_button["image"], back_button["rect"])
         win.blit(text, ((width+delta//10)-15, (end-top)/2.5))
+        win.blit(mode_button["image"], mode_button["rect"])
+        win.blit(sound_button["image"], sound_button["rect"])
         for algorithm in algorithms:
             algorithm.draw(win,theme_type=theme_type)
         
