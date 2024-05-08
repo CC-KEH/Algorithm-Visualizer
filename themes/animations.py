@@ -18,20 +18,6 @@ def visit_animation2(node,theme_type):
         b += 1
         node.color = (r, g, b)
         return False
-    
-# def path_animation(path,theme_type):
-#     for node in path:
-#         if not node.is_start():
-#             r, g, b = node.color
-#             if node.dec_animation:
-#                 g -= 1
-#                 if g <= themes[theme_type]["path_color_1"][1]:
-#                     node.dec_animation = False
-#             else:
-#                 g += 1
-#                 if g >= themes[theme_type]["path_color_2"][1]:
-#                     node.dec_animation = True
-#         node.color = (r, g, b)
         
 def path_animation(path, theme_type):
     for node in path:

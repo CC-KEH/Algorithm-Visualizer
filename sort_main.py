@@ -58,6 +58,10 @@ def draw(draw_info, algorithms, back_button, mode_button, sound_button, options,
         draw_info.window.blit(sound_button["image"], sound_button["rect"])
         # Draw menu functions
         for algorithm in algorithms:
+            if theme_type == 'Synth':        
+                algorithm.theme_type = 'Synth'
+            else:
+                algorithm.theme_type = 'Default'
             algorithm.draw(draw_info.window,theme_type=theme_type)
         
         text = font.render("Settings", 1, themes[theme_type]["heading_color"])
@@ -72,9 +76,19 @@ def draw(draw_info, algorithms, back_button, mode_button, sound_button, options,
             
             if option.text=='Uniform Array' or option.text=='Non-Uniform Array':
                 option.text=f"{'Uniform Array' if is_uniform else 'Non-Uniform Array'}"
+    
+            if theme_type == 'Synth':        
+                option.theme_type = 'Synth'
+            
+            else:
+                output.theme_type = 'Default'    
             
             option.draw(draw_info.window,theme_type=theme_type)
-            
+        
+        if theme_type == 'Synth':        
+            output.theme_type = 'Synth'
+        else:
+            output.theme_type = 'Default'
         output.draw(draw_info.window,theme_type=theme_type)
     pygame.display.update()
 

@@ -1,4 +1,3 @@
-from turtle import back, color
 import pygame
 from themes.colors import *
 from themes.animations import *
@@ -6,14 +5,13 @@ from grid import *
 from themes.themes import *
 class button():
     def __init__(self, x, y,width,height, theme_type,text=''):
-        self.color = themes[theme_type]["inactive_button_color"]
-        self.text_color = themes[theme_type]["button_text_color"]
+        self.theme_type = theme_type
+        self.color = themes[self.theme_type]["inactive_button_color"]
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.text = text
-        self.theme_type = theme_type
 
     def draw(self,win,theme_type,outline=True):
         mouse_pos = pygame.mouse.get_pos()
@@ -29,7 +27,7 @@ class button():
 
         if self.text != '':
             font = pygame.font.SysFont('verdana', 20)
-            text = font.render(self.text, 1, self.text_color)
+            text = font.render(self.text, 1, themes[theme_type]["button_text_color"])
             win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
 
     def is_hover(self, pos):
@@ -86,7 +84,7 @@ class screen():
         if outline:
             pygame.draw.rect(win, outline, (self.x-2,self.y-2,self.width+4,self.height+4),0)
             
-        pygame.draw.rect(win, self.color, (self.x,self.y,self.width,self.height),0)
+        pygame.draw.rect(win, themes[theme_type]["output_screen_color"], (self.x,self.y,self.width,self.height),0)
         
         
         if self.label1 != '':
@@ -141,12 +139,14 @@ def is_hover(button, pos):
     else:
         return False
 
-def draw(win, grid, rows, width, algorithms, mazes,back_button,mode_button,sound_button, options, output,theme_type, menu = True):
+def draw(win, grid, rows, width, algorithms, mazes, back_button, mode_button, sound_button, options, output, theme_type, menu = True):
     win.fill(themes[theme_type]["menu_bg_color"])
     for row in grid:
         for node in row:
+            if theme_type == "Synth":
+                node.theme_type = "Synth"
             node.draw(win)
-    draw_grid(win, rows, width,theme_type)
+    draw_grid(win, rows, width, theme_type)
     if menu:
         n = 17
         delta = 700
@@ -162,6 +162,10 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button,mode_button,sound
         win.blit(mode_button["image"], mode_button["rect"])
         win.blit(sound_button["image"], sound_button["rect"])
         for algorithm in algorithms:
+            if theme_type == "Synth":
+                algorithm.theme_type = "Synth"
+            else:
+                algorithm.theme_type = "Default"
             algorithm.draw(win,theme_type=theme_type)
         
         text = font.render("Generate Maze", 1, themes[theme_type]["heading_color"])
@@ -170,6 +174,10 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button,mode_button,sound
         end += (1.9*(3*but_height//2)) + but_height + ht//12
         win.blit(text, (width+delta//5.3, (end-top) + top))
         for maze in mazes:
+            if theme_type == "Synth":
+                maze.theme_type = "Synth"
+            else:
+                maze.theme_type = "Default"
             maze.draw(win,theme_type=theme_type)
             
         end += (1.3*(3*but_height//2)) + ht//6
@@ -178,7 +186,16 @@ def draw(win, grid, rows, width, algorithms, mazes,back_button,mode_button,sound
         text = font.render("Grid Settings", 1, themes[theme_type]["heading_color"])
         win.blit(text, (width+delta//4.7, ((end-top)/2) + top))
         for option in options:
+            if theme_type == "Synth":
+                option.theme_type = "Synth"
+            else:
+                option.theme_type = "Default"
             option.draw(win,theme_type=theme_type)
+        
+        if theme_type == "Synth":
+            output.theme_type = "Synth"
+        else:
+            output.theme_type = "Default"    
         output.draw(win,theme_type=theme_type)
     pygame.display.update()
     

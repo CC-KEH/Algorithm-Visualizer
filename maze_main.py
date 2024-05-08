@@ -11,7 +11,7 @@ import main_app
 ICON_SIZE = (50,50)
 
 def main(win, width):
-    theme_type = 'Synth'
+    theme_type = 'Default'
     ROWS = 50
     w, ht = pygame.display.get_surface().get_size()
     width = ht
@@ -29,23 +29,20 @@ def main(win, width):
     back_button = {}
     sound_button = {}
     mode_button = {}
-    if theme_type == 'Default':
-        back_icon = pygame.image.load('assets/black_back.png')
-        day_icon = pygame.image.load('assets/black_sun.png')
-        # night_icon = pygame.image.load('assets/black_moon.png')
-        sound_icon = pygame.image.load('assets/black_sound_icon.png')
-        mute_icon = pygame.image.load('assets/black_mute_icon.png')
     
-    else:
-        back_icon = pygame.image.load('assets/white_back.png')
-        # day_icon = pygame.image.load('assets/white_sun.png')
-        night_icon = pygame.image.load('assets/white_moon.png')
-        sound_icon = pygame.image.load('assets/white_sound.png')
-        mute_icon = pygame.image.load('assets/white_mute.png')
-        
-    create_button(back_button,back_icon,((820), (ht//40)/2.5))
-    create_button(mode_button, day_icon, ((1340), (ht//40)/2.5))
-    create_button(sound_button, sound_icon, ((1440), (ht//40)/2.5))
+    black_back_icon = pygame.image.load('assets/black_back.png')
+    black_day_icon = pygame.image.load('assets/black_sun.png')
+    black_sound_icon = pygame.image.load('assets/black_sound.png')
+    black_mute_icon = pygame.image.load('assets/black_mute.png')
+    
+    white_back_icon = pygame.image.load('assets/white_back.png')
+    white_night_icon = pygame.image.load('assets/white_moon.png')
+    white_sound_icon = pygame.image.load('assets/white_sound.png')
+    white_mute_icon = pygame.image.load('assets/white_mute.png')
+    
+    create_button(back_button,black_back_icon,((820), (ht//40)/2.5))
+    create_button(mode_button, black_day_icon, ((1340), (ht//40)/2.5))
+    create_button(sound_button, black_sound_icon, ((1440), (ht//40)/2.5))
     
     algorithms = [
         button(width + start_factor, top_start + vertical_gap_factor,
@@ -144,10 +141,10 @@ def main(win, width):
                 elif event.key == pygame.K_m:
                     muted = not muted
                     if muted:
-                        output.set_text1("Muted")
+                        sound_button["image"] = black_mute_icon if theme_type == 'Default' else white_mute_icon
                     else:
-                        output.set_text1("Unmuted")
-                    
+                        sound_button["image"] = black_sound_icon if theme_type == 'Default' else white_sound_icon
+                
                 elif event.key == pygame.K_g:
                     if maze_gen_algorithm:
                         maze_gen_algorithm(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_button,
@@ -183,17 +180,22 @@ def main(win, width):
                 if is_hover(sound_button,pos):
                     muted = not muted
                     if muted:
-                        sound_button["image"] = mute_icon
+                        sound_button["image"] = black_mute_icon if theme_type == 'Default' else white_mute_icon
                     else:
-                        sound_button["image"] = sound_icon
-                    
+                        sound_button["image"] = black_sound_icon if theme_type == 'Default' else white_sound_icon
+                
                 if is_hover(mode_button,pos):
                     theme_type = 'Default' if theme_type == 'Synth' else 'Synth'
                     if theme_type == 'Default':
-                        mode_button["image"] = day_icon
+                        mode_button["image"] = black_day_icon
+                        back_button["image"] = black_back_icon
+                        sound_button["image"] = black_mute_icon if muted else black_sound_icon
+                        
                     else:
-                        mode_button["image"] = night_icon
-                
+                        mode_button["image"] = white_night_icon
+                        back_button["image"] = white_back_icon
+                        sound_button["image"] = white_mute_icon if muted else white_sound_icon
+
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
                     output.set_text1("Breath First Search")

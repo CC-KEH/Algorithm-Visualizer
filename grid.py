@@ -9,13 +9,14 @@ pygame.display.set_caption("Path Finding Visualizer")
 
 
 class Node:
-    def __init__(self, row, col, width, total_rows,theme_type):
+    def __init__(self, row, col, width, total_rows, theme_type):
         self.last = pygame.time.get_ticks()
         self.row = row
         self.col = col
         self.x = row*width
         self.y = col*width
-        self.color = themes[theme_type]["plane_color"]
+        self.theme_type = theme_type
+        self.color = themes[self.theme_type]["plane_color"]
         self.width = width
         self.neighbors = []
         self.total_rows = total_rows
@@ -24,7 +25,6 @@ class Node:
         self.cooldown = 300
         self.distance = float('inf')
         self.t = 0
-        self.theme_type = theme_type
         
     def set_distance(self, distance):
         self.distance = distance
@@ -142,18 +142,18 @@ def make_grid(rows, width,theme_type):
     for i in range(rows):
         grid.append([]) 
         for j in range(rows):
-            node = Node(i, j, node_width, rows,theme_type=theme_type)
+            node = Node(i, j, node_width, rows, theme_type=theme_type)
             grid[i].append(node)
     return grid
 
 
-def make_grid(rows, width,theme_type):
+def make_grid(rows, width, theme_type):
     grid = []
     gap = width // rows
     for i in range(rows):
         grid.append([])
         for j in range(rows):
-            node = Node(i, j, gap, rows,theme_type=theme_type)
+            node = Node(i, j, gap, rows, theme_type=theme_type)
             grid[i].append(node)
     return np.array(grid)
 
