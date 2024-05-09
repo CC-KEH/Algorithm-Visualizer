@@ -1,8 +1,5 @@
 import math
-from operator import is_
-from turtle import back
 import pygame
-import pygame.gfxdraw
 import random
 from system import button,screen,create_button,is_hover
 from themes.colors import *
@@ -19,12 +16,12 @@ LARGE_FONT = pygame.font.SysFont("comicsans", 40)
 ICON_SIZE = (50,50)
 
 class DrawInformation:
-    def __init__(self, width, height, lst, window, color=BG_COLOR):
+    def __init__(self, width, height, lst, window, theme_type):
         self.width = width
         self.height = height
         self.lst = lst
         self.window = window
-        self.bg_color = color
+        self.bg_color = themes[theme_type]["bg_color"]
         self.set_list(lst)
 
     def set_list(self, lst):
@@ -47,13 +44,13 @@ def draw(draw_info, algorithms, back_button, mode_button, sound_button, options,
 
         font = pygame.font.SysFont('verdana', 35)
         text = font.render("Sorting Algorithms", 1, themes[theme_type]["heading_color"])
-        top = 0
+        top = 0  
         ht = 900
         width = ht
         delta = 700
         end = ht//40
         draw_info.window.blit(back_button["image"], back_button["rect"])
-        draw_info.window.blit(text, ((width+delta//3.7), (end-top)/2.5))
+        draw_info.window.blit(text, ((width+delta//4.3), (end-top)/2.5))
         draw_info.window.blit(mode_button["image"], mode_button["rect"])
         draw_info.window.blit(sound_button["image"], sound_button["rect"])
         # Draw menu functions
@@ -139,15 +136,15 @@ def draw_list(draw_info, color_positions={}, theme_type='Default', clear_bg=Fals
         if i in color_positions:
             color = color_positions[i]
 
-        if theme_type == 'Default':
-            target_color = themes[theme_type]['bars_color_2'][i % 3]
-            t = (pygame.time.get_ticks() % 2000) / 2000  # Change 2000 to adjust speed
-            t = (math.sin(t * 2 * math.pi) + 1) / 2  # Map time to [0, 1] range
-            color = (
-                color[0] * (1 - t) + target_color[0] * t,
-                color[1] * (1 - t) + target_color[1] * t,
-                color[2] * (1 - t) + target_color[2] * t
-            )
+        
+        target_color = themes[theme_type]['bars_color_2'][i % 3]
+        t = (pygame.time.get_ticks() % 2000) / 2000  # Change 2000 to adjust speed
+        t = (math.sin(t * 2 * math.pi) + 1) / 2  # Map time to [0, 1] range
+        color = (
+            color[0] * (1 - t) + target_color[0] * t,
+            color[1] * (1 - t) + target_color[1] * t,
+            color[2] * (1 - t) + target_color[2] * t
+        )
         pygame.draw.rect(draw_info.window, color, (x, y, draw_info.bar_width, draw_info.height))
 
     if clear_bg:
@@ -194,9 +191,9 @@ def main(window):
     white_mute_icon = pygame.image.load('assets/white_mute.png')
     
     
-    create_button(back_button, white_back_icon, ((1020), (900//40)/2.5))
-    create_button(mode_button, black_day_icon, ((1370), (900//40)/2.5))
-    create_button(sound_button, white_sound_icon, ((1440), (900//40)/2.5))
+    create_button(back_button, black_back_icon, ((1010), (900//40)/2.5))
+    create_button(mode_button, black_day_icon, ((1395), (900//40)/2.5))
+    create_button(sound_button, black_sound_icon, ((1445), (900//40)/2.5))
     
     algorithms = [
         button(width+delta//4 +30, top_start + vertical_gap_factor,
@@ -243,7 +240,7 @@ def main(window):
     sc_width = (but_width-but_height-17)*2
     lst = generate_list(n, min_val, max_val,uniform=False)
     
-    draw_info = DrawInformation(width + 150, width, lst, window)
+    draw_info = DrawInformation(width + 150, width, lst, window, theme_type)
     sorting = False
     sorting_algorithm = None
     sorting_algorithm_name = ""
@@ -271,6 +268,7 @@ def main(window):
                 
             except StopIteration:
                 sorting = False
+                
         if is_uniform:  
             draw(draw_info,algorithms,back_button,mode_button,sound_button,options,output,theme_type,ascending=ascending,is_uniform=True)  
         else: 
@@ -320,9 +318,16 @@ def main(window):
                     theme_type = 'Default' if theme_type == 'Synth' else 'Synth'
                     if theme_type == 'Default':
                         mode_button["image"] = black_day_icon
+                        back_button["image"] = black_back_icon
+                        sound_button["image"] = black_mute_icon if muted else black_sound_icon
+                        
                     else:
                         mode_button["image"] = white_night_icon
-                
+                        back_button["image"] = white_back_icon
+                        sound_button["image"] = white_mute_icon if muted else white_sound_icon
+                    
+                    draw_info = DrawInformation(width + 150, width, lst, window, theme_type)
+
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
                     sorting_algorithm = bubble_sort

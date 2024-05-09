@@ -19,37 +19,6 @@ BUTTON_WIDTH = 500
 BUTTON_HEIGHT = 300
 BOTTOM_SECTION_HEIGHT = 300
 
-# Information to display
-info = """
-Algorithm Visualizer
-
-Python program that showcases various sorting and pathfinding algorithms.
-
-Sorting Algorithms:\n
-Bubble Sort
-Selection Sort
-Insertion Sort
-Merge Sort
-Quick Sort
-Tim Sort
-Bucket Sort
-Radix Sort
-Count Sort
-
-Pathfinding Algorithms:\n
-BFS Search
-Bi-BFS Search
-DFS Search
-Dijkstra Search
-A* Search
-IDA* Search
-Bi-A* Search
-Bellman-Ford Search
-"""
-
-# Split the information into lines
-lines = info.split('\n')
-
 # Set up the window
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Start Menu")
@@ -119,10 +88,7 @@ def main_menu():
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Start Menu")
     # Load the background image
-    background = pygame.image.load('assets/bg_default.png')
-
-    # Scale the image
-    background = pygame.transform.scale(background, (WINDOW_WIDTH-500, WINDOW_HEIGHT))
+    background = pygame.image.load('assets/bg.png')
 
     while True:
         for event in pygame.event.get():
@@ -132,22 +98,6 @@ def main_menu():
 
         # Draw the background image
         window.blit(background, (0, 0))
-        in_path_search = False
-        # Display the information
-        for i, line in enumerate(lines):
-            if line.endswith("Visualizer"):
-                display_info_text(line, 10, i * FONT_SIZE/2, BLACK, font_size=50)
-            elif not in_path_search:
-                display_info_text(line, 10, i * FONT_SIZE/2, BLACK,font_size=30)
-            elif in_path_search:
-                display_info_text(line, 10, i * FONT_SIZE/2.1, BLACK,font_size=30)
-            elif line.endswith("Sorting Algorithms:"):
-                display_info_text(line, 10, i * FONT_SIZE//2.1, BLACK, font_size=40)
-            elif line.endswith("Pathfinding Algorithms:"):
-                in_path_search = True
-                display_info_text(line, 10, i * FONT_SIZE//2.1, BLACK, font_size=40)
-                                
-
         # Create buttons
         button("Pathfinding", 2*BUTTON_WIDTH, WINDOW_HEIGHT - WINDOW_HEIGHT, BUTTON_WIDTH, WINDOW_HEIGHT//2,
                BTN_1, ACT_BTN_1, start_pathfinding_visualizer)

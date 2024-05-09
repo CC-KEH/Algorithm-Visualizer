@@ -1,14 +1,7 @@
-# from themes.colors import *
-from tkinter import END
-
-from themes.colors import GREEN, LIGHT_BLUE, LIME_GREEN, PALE_YELLOW
-
-
 LIGHT_CREAM = (251, 248, 204)
 CREAM = (253, 228, 207)
 LOW_ORANGE = (255, 207, 210)
 ORANGE = (255,144,31)
-
 LOW_PINK = (241, 192, 232)
 LAVENDER = (207, 186, 240)
 DARK_BLUE = (128, 147, 241)
@@ -67,7 +60,7 @@ themes = {
         "output_screen_color": CREAM,
         "font_color": BLACK,
         "bars_color": [BLUE, LOW_AQUA, AQUA],
-        "bars_color_2": [(173, 196, 243),(164, 219, 244), (162, 236, 245)],
+        "bars_color_2": [(183, 196, 243),(164, 219, 244), (162, 236, 245)],
         "current_color": LIGHT_LEMON,
         "other_color": LOW_PINK,
         "pivot_color": LOW_ORANGE,
@@ -82,7 +75,7 @@ themes = {
         "button_text_color": (255, 200, 150),
         "start_color": AQUA,
         "end_color": SMOOTH_LEMON,
-        "barrier_color": BARRIER_COLOR_1,
+        "barrier_color": BLACK,
         "weight_color": (255, 200, 200),
         "look_color": DARK_LAVENDER,
         "open_color": PURPLE,
@@ -97,12 +90,12 @@ themes = {
         "path_color_3": DARK_LAVENDER,
         "plane_color": BLACK,
         "bg_color": DARK_PURPLE,
-        "grid_color": BARRIER_COLOR_1,
+        "grid_color": BARRIER_COLOR_2,
         "grid_color_2": BARRIER_COLOR_2,
         "output_screen_color": PEACH,
         "font_color": BLACK,
         "bars_color": [(255, 200, 150), (255, 0, 124), (124, 0, 255)], 
-        "bars_color_2": [(255, 200, 200), (255, 50, 125), (124, 50, 250)],
+        "bars_color_2": [(255, 200, 210), (255, 60, 125), (124, 60, 250)],
         "current_color": (0,255,0),
         "other_color": (255,0,0),
         "pivot_color": (0,0,255),

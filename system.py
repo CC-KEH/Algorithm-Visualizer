@@ -146,7 +146,7 @@ def draw(win, grid, rows, width, algorithms, mazes, back_button, mode_button, so
             if theme_type == "Synth":
                 node.theme_type = "Synth"
             node.draw(win)
-    draw_grid(win, rows, width, theme_type)
+    draw_grid(win, grid, width, theme_type)
     if menu:
         n = 17
         delta = 700
@@ -158,7 +158,7 @@ def draw(win, grid, rows, width, algorithms, mazes, back_button, mode_button, so
         top = 0
         end = ht//40
         win.blit(back_button["image"], back_button["rect"])
-        win.blit(text, ((width+delta//10)-15, (end-top)/2.5))
+        win.blit(text, ((width+delta//10)-20, (end-top)/2.5))
         win.blit(mode_button["image"], mode_button["rect"])
         win.blit(sound_button["image"], sound_button["rect"])
         for algorithm in algorithms:
@@ -172,7 +172,7 @@ def draw(win, grid, rows, width, algorithms, mazes, back_button, mode_button, so
         but_height = ht//15
         top += (4.3*but_height)
         end += (1.9*(3*but_height//2)) + but_height + ht//12
-        win.blit(text, (width+delta//5.3, (end-top) + top))
+        win.blit(text, (width+delta//5.2, (end-top) + top))
         for maze in mazes:
             if theme_type == "Synth":
                 maze.theme_type = "Synth"

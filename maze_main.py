@@ -12,7 +12,7 @@ ICON_SIZE = (50,50)
 
 def main(win, width):
     theme_type = 'Default'
-    ROWS = 50
+    ROWS = 25
     w, ht = pygame.display.get_surface().get_size()
     width = ht
     grid = make_grid(ROWS, width, theme_type)
@@ -40,9 +40,9 @@ def main(win, width):
     white_sound_icon = pygame.image.load('assets/white_sound.png')
     white_mute_icon = pygame.image.load('assets/white_mute.png')
     
-    create_button(back_button,black_back_icon,((820), (ht//40)/2.5))
-    create_button(mode_button, black_day_icon, ((1340), (ht//40)/2.5))
-    create_button(sound_button, black_sound_icon, ((1440), (ht//40)/2.5))
+    create_button(back_button, black_back_icon,((820), (ht//40)/2.5))
+    create_button(mode_button, black_day_icon, ((1380), (ht//40)/2.5))
+    create_button(sound_button, black_mute_icon, ((1440), (ht//40)/2.5))
     
     algorithms = [
         button(width + start_factor, top_start + vertical_gap_factor,
@@ -108,7 +108,7 @@ def main(win, width):
     path = False
     search_algorithm = None
     maze_gen_algorithm = maze_gen_dfs
-    muted = False
+    muted = True
     while run:
         if len(visited):
             visit_animation(visited,theme_type)
@@ -145,11 +145,6 @@ def main(win, width):
                     else:
                         sound_button["image"] = black_sound_icon if theme_type == 'Default' else white_sound_icon
                 
-                elif event.key == pygame.K_g:
-                    if maze_gen_algorithm:
-                        maze_gen_algorithm(lambda: draw(win, grid, ROWS, width, algorithms, mazes, back_button,
-                                options, output,theme_type), width, grid, start, end, 0, ROWS, 0, ROWS, win, theme_type)
-                    
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
@@ -195,7 +190,9 @@ def main(win, width):
                         mode_button["image"] = white_night_icon
                         back_button["image"] = white_back_icon
                         sound_button["image"] = white_mute_icon if muted else white_sound_icon
-
+                    
+                    grid = make_grid(ROWS, width, theme_type)
+                    
                 elif algorithms[0].is_hover(pos):
                     algorithms[0].toggle_color()
                     output.set_text1("Breath First Search")
@@ -252,6 +249,9 @@ def main(win, width):
                     output.set_text2("")
                     output.draw(win, outline=BLACK,theme_type=theme_type)
                     pygame.display.update()
+                    grid = make_grid(ROWS, width, theme_type)
+                    start = None
+                    end = None
                     maze_gen_algorithm = prepare_for_maze(maze_gen_dfs, output, win, grid, ROWS, width, algorithms, mazes, back_button, options,theme_type)
 
                 elif mazes[1].is_hover(pos):
@@ -260,6 +260,9 @@ def main(win, width):
                     output.set_text2("")
                     output.draw(win, outline=BLACK,theme_type=theme_type)
                     pygame.display.update()
+                    grid = make_grid(ROWS, width, theme_type)
+                    start = None
+                    end = None
                     maze_gen_algorithm = prepare_for_maze(maze_gen_random, output, win, grid, ROWS, width, algorithms, mazes, back_button, options,theme_type)
                 
                 elif options[0].is_hover(pos):
@@ -296,7 +299,7 @@ def main(win, width):
                     if ROWS > 5:
                         ROWS -= 1
                         grid = make_grid(ROWS, width, theme_type)
-                    output.set_label1(f"Number of rows: {ROWS}")
+                    output.set_label1(f"Rows {ROWS}")
 
                 elif options[2].is_hover(pos):
                     weighted = []
@@ -311,7 +314,7 @@ def main(win, width):
                     if ROWS < 100:
                         ROWS += 1
                         grid = make_grid(ROWS, width,theme_type)
-                    output.set_label1(f"Number of rows: {ROWS}")
+                    output.set_label1(f"Rows {ROWS}")
 
             elif pygame.mouse.get_pressed()[1]:
                 pos = pygame.mouse.get_pos()

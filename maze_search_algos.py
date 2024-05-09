@@ -5,8 +5,9 @@ from themes.animations import *
 from utils import *
 from grid import *
 import numpy as np
+import threading
 
-SCALE_FACTOR = 30
+SCALE_FACTOR = 40
 
 def reconstruct_path(came_from, start, current, draw, visited,  win, width, theme_type, grid, is_draw = True): 
     path = []
@@ -27,7 +28,7 @@ def reconstruct_path(came_from, start, current, draw, visited,  win, width, them
             for rows in grid:
                 for node in rows:
                     node.draw(win)
-            draw_grid(win, len(grid), width,theme_type)
+            draw_grid(win, grid, width, theme_type)
             pygame.display.update()
     return path, c-1
         
@@ -72,7 +73,6 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type,muted):
                              1. Path Length: {inc}\n
                              2. Visited nodes: {vis}
                              """)
-                    
                     if vis != 0:
                         output.set_text4(f"""
                              1. Path Length: {inc}\n
@@ -83,9 +83,10 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type,muted):
                 queue.append(neighbor)
                 visited.append(neighbor)
                 neighbor.make_open()   
-                distance = h_score(neighbor.get_pos(), end.get_pos())
                 if not muted:
-                    play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
+                    distance = h_score(neighbor.get_pos(), end.get_pos())
+                    sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                    sound_thread.start()
 
         if current != start:
             vis+=c
@@ -96,7 +97,7 @@ def maze_bfs(draw,grid,start,end,output, win, width,theme_type,muted):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width,theme_type)
+        draw_grid(win, grid, width,theme_type)
         pygame.display.update()
             
     return visited, False
@@ -153,6 +154,11 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type,muted):
                              3. Efficiency: {np.round(inc/vis, decimals=3)}
                              """)
                     return visited, path
+            if not muted:
+                distance = h_score(neighbor.get_pos(), end.get_pos())
+                sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                sound_thread.start()
+                # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
         if current != start:
             vis += c
@@ -163,7 +169,7 @@ def maze_dfs(draw, grid, start, end, output, win, width,theme_type,muted):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width,theme_type)
+        draw_grid(win, grid, width,theme_type)
         pygame.display.update()
 
     return visited, False
@@ -226,11 +232,18 @@ def maze_dijkstra(draw, grid, start, end, output, win, width,theme_type,muted):
                 distances[neighbor] = distance_to_neighbor
                 priority_queue.put((distance_to_neighbor, neighbor))
                 neighbor.make_open()
+            
+            if not muted:
+                distance = h_score(neighbor.get_pos(), end.get_pos())
+                sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                sound_thread.start()
+
+                # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width,theme_type)
+        draw_grid(win, grid, width,theme_type)
         pygame.display.update()
 
     return visited_list, False
@@ -291,7 +304,13 @@ def maze_astar(draw, grid, start, end, output, win, width,theme_type,muted):
                     if neighbor != end:
                         nebrs.append(neighbor)
                         neighbor.make_open()
-        
+                        
+            if not muted:
+                distance = h_score(neighbor.get_pos(), end.get_pos())
+                sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                sound_thread.start()
+                # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
+
         if current != start:
             vis+=c
             visited.append(current)
@@ -300,12 +319,12 @@ def maze_astar(draw, grid, start, end, output, win, width,theme_type,muted):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width,theme_type)
+        draw_grid(win, grid, width,theme_type)
         pygame.display.update()
             
     return False
 
-def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold=100, moving_target= False, visited_old = []):
+def maze_idastar(draw, grid, start, end,output, win, width, theme_type, muted=False, threshold=100, moving_target= False, visited_old = []):
     if threshold < len(grid)**2:
         count = 0
         vis = 0
@@ -364,6 +383,11 @@ def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold
                             if neighbor != end:
                                 nebrs.append(neighbor)
                                 neighbor.make_open()
+                    if not muted:
+                        distance = h_score(neighbor.get_pos(), end.get_pos())
+                        sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                        sound_thread.start()
+                        # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
             if current != start:
                 visited.append(current)
@@ -374,7 +398,7 @@ def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold
             for rows in grid:
                 for node in rows:
                     node.draw(win)
-            draw_grid(win, len(grid), width,theme_type)
+            draw_grid(win, grid, width,theme_type)
             pygame.display.update()
             
         if visited == visited_old:
@@ -382,7 +406,7 @@ def maze_idastar(draw, grid, start, end,output, win, width,theme_type, threshold
         return maze_idastar(draw, win, width, output ,grid, start, end, threshold+10, moving_target, visited)
     return [], False
 
-def maze_bellman_ford(draw, grid, start, end, output, win, width, theme_type):
+def maze_bellman_ford(draw, grid, start, end, output, win, width, theme_type, muted=False):
     nodes = [node for row in grid for node in row]
     edges = [(node, neighbor) for node in nodes for neighbor in node.neighbors if not neighbor.is_barrier()]
 
@@ -391,16 +415,16 @@ def maze_bellman_ford(draw, grid, start, end, output, win, width, theme_type):
 
     for _ in range(len(nodes) - 1):
         for node, neighbor in edges:
-            if neighbor.is_barrier():
-                c = float('inf')
-            if neighbor.is_weight():
-                c = 5
-            else:
-                c = 1
-            if distances[node] + c < distances[neighbor]:
-                distances[neighbor] = distances[node] + c
-                neighbor.make_open()
-
+            if not neighbor.is_barrier():
+                if neighbor.is_weight():
+                    c = 5
+                else:
+                    c = 1
+                if distances[node] + c < distances[neighbor]:
+                    distances[neighbor] = distances[node] + c
+                    if not neighbor.is_barrier():
+                        neighbor.make_open()
+                    
     # Reconstruct path
     came_from = {}
     node = end
@@ -425,23 +449,27 @@ def maze_bellman_ford(draw, grid, start, end, output, win, width, theme_type):
 
     return nodes, path
 
-def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_target=False):
+def maze_bi_astar(draw, grid, start, end, output, win, width, theme_type, muted=False):
     count = 0
     vis = 0
     open_set_start = PriorityQueue()
     open_set_start.put((0, count, start))
     came_from_start = {}
+
     open_set_end = PriorityQueue()
     open_set_end.put((0, count, end))
     came_from_end = {}
+
     g_score_start = {node: float("inf") for row in grid for node in row}
-    g_score_end = {node: float("inf") for row in grid for node in row}
     g_score_start[start] = 0
-    g_score_end[end] = 0
     f_score_start = {node: float("inf") for row in grid for node in row}
-    f_score_end = {node: float("inf") for row in grid for node in row}
     f_score_start[start] = h_score(start.get_pos(), end.get_pos())
+    
+    g_score_end = {node: float("inf") for row in grid for node in row}
+    g_score_end[end] = 0
+    f_score_end = {node: float("inf") for row in grid for node in row}
     f_score_end[end] = h_score(start.get_pos(), end.get_pos())
+
     x1, y1 = start.get_pos()
     x2, y2 = end.get_pos()
     threshold = max((abs(x1-x2) + abs(y1-y2))//2, len(grid)//3)
@@ -454,18 +482,8 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
 
     open_set_hash_start = {start}
     open_set_hash_end = {end}
+    
     while len(open_set_hash_start) and len(open_set_hash_end):
-        if moving_target:
-            li = [i for i in end.neighbors if i.is_neutral()]
-            if len(li):
-                end.reset()
-                end = li[np.random.randint(len(li))]
-                end.make_end()
-                for rows in grid:
-                    for node in rows:
-                        node.draw(win)
-                        draw_grid(win, len(grid), width,theme_type)
-                        pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -495,7 +513,7 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                             neighbor.make_open()
                 elif neighbor != start and neighbor not in v1:
                     neighbor.color = (254, 102, 1)
-                    draw_grid(win, len(grid), width,theme_type)
+                    draw_grid(win, grid, width,theme_type)
                     pygame.display.update()
                     came_from_start[neighbor] = current
                     path1, inc1 = reconstruct_path(
@@ -516,6 +534,13 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                         3. Efficiency: {np.round(inc1+inc2+1/vis, decimals=3)}
                         """)
                     return visited1+visited2, path1+path2
+                
+            if not muted:
+                distance = h_score(neighbor.get_pos(), end.get_pos())
+                sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                sound_thread.start()
+                # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
+
         if current != start:
             if current in visited1:
                 visited1.remove(current)
@@ -528,7 +553,7 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width,theme_type)
+        draw_grid(win, grid, width,theme_type)
         pygame.display.update()
         if not lock:
             current = open_set_end.get()[2]
@@ -556,7 +581,7 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                                 neighbor.make_open()
                     elif neighbor != end and neighbor not in v2:
                         neighbor.color = (254, 102, 1)
-                        draw_grid(win, len(grid), width,theme_type)
+                        draw_grid(win, grid, width,theme_type)
                         pygame.display.update()
                         came_from_end[neighbor] = current
                         path1, inc1 = reconstruct_path(
@@ -576,6 +601,11 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
                         3. Efficiency: {np.round(inc1+inc2+1/vis, decimals=3)}
                         """)
                         return visited2+visited1, path1+path2
+                if not muted:
+                    distance = h_score(neighbor.get_pos(), end.get_pos())
+                    sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                    sound_thread.start()
+                    # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
             if current != end:
                 if current in visited2:
@@ -589,12 +619,12 @@ def maze_bi_astar(draw, grid, start, end, output, win, width,theme_type, moving_
             for rows in grid:
                 for node in rows:
                     node.draw(win)
-            draw_grid(win, len(grid), width,theme_type)
+            draw_grid(win, grid, width,theme_type)
             pygame.display.update()
 
     return visited2+visited1, False
 
-def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type,muted):
+def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type,muted=False):
     queue1 = [start]
     queue2 = [end]
     visited1 = [start]
@@ -708,6 +738,11 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type,muted):
                     queue1.append(neighbor)
                     visited1.append(neighbor)
                     neighbor.make_open()
+            if not muted:
+                distance = h_score(neighbor.get_pos(), end.get_pos())
+                sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                sound_thread.start()
+                # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
         for neighbor in current2.neighbors:
             if not neighbor.is_barrier():
@@ -732,6 +767,11 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type,muted):
                     queue2.append(neighbor)
                     visited2.append(neighbor)
                     neighbor.make_open()
+            if not muted:
+                distance = h_score(neighbor.get_pos(), end.get_pos())
+                sound_thread = threading.Thread(target=play_sound, args=(distance * SCALE_FACTOR,))
+                sound_thread.start()
+                # play_sound(distance * SCALE_FACTOR)  # Play a sound each time a new node is visited
 
         if current1 != start:
             vis += c
@@ -740,7 +780,7 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type,muted):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width,theme_type)
+        draw_grid(win, grid, width,theme_type)
         pygame.display.update()
 
         if current2 != end:
@@ -750,7 +790,7 @@ def maze_bi_bfs(draw, grid, start, end, output, win, width,theme_type,muted):
         for rows in grid:
             for node in rows:
                 node.draw(win)
-        draw_grid(win, len(grid), width,theme_type)
+        draw_grid(win, grid, width,theme_type)
         pygame.display.update()
 
     return visited1+visited2, False

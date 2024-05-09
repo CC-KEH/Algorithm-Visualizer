@@ -1,7 +1,6 @@
 import pygame 
 from themes.colors import *
 from themes.themes import themes
-import numpy as np
 
 WIDTH = 800
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
@@ -136,7 +135,7 @@ class Node:
     def __lt__(self, other):
         return False
 
-def make_grid(rows, width,theme_type):
+def make_grid(rows, width, theme_type):
     grid = []
     node_width = width // rows
     for i in range(rows):
@@ -146,25 +145,19 @@ def make_grid(rows, width,theme_type):
             grid[i].append(node)
     return grid
 
-
-def make_grid(rows, width, theme_type):
-    grid = []
-    gap = width // rows
-    for i in range(rows):
-        grid.append([])
-        for j in range(rows):
-            node = Node(i, j, gap, rows, theme_type=theme_type)
-            grid[i].append(node)
-    return np.array(grid)
-
 def lerp_color(color1, color2, t):
     return (int(color1[i] * (1 - t) + color2[i] * t) for i in range(3))
 
 
-def draw_grid(win, rows, width, theme_type):
+def draw_grid(win, grid, width, theme_type):
+    rows = len(grid)
+
     gap = width // rows
+
     for i in range(rows+1):
         pygame.draw.line(win, themes[theme_type]["grid_color"], (0, i*gap), (rows*gap, i*gap))
+        
+        
     for i in range(rows+1):
         pygame.draw.line(win, themes[theme_type]["grid_color"], (i*gap, 0), (i*gap, rows*gap))
 
