@@ -88,7 +88,7 @@ themes = {
         "path_color_1": PINKISH_RED,
         "path_color_2": PURPLE,
         "path_color_3": DARK_LAVENDER,
-        "plane_color": BLACK,
+        "plane_color": BARRIER_COLOR_1,
         "bg_color": DARK_PURPLE,
         "grid_color": BARRIER_COLOR_2,
         "grid_color_2": BARRIER_COLOR_2,

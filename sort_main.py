@@ -34,7 +34,10 @@ class DrawInformation:
         self.start_x = SIDE_PADDING // 2
 
 def draw(draw_info, algorithms, back_button, mode_button, sound_button, options, output, theme_type, ascending, menu=True,is_uniform=False):
-    draw_info.window.fill(themes[theme_type]['plane_color'])
+    if theme_type == 'Synth':
+        draw_info.window.fill(BLACK)
+    else:
+        draw_info.window.fill(themes[theme_type]['plane_color'])
     # Draw sorting visualizer
     draw_list(draw_info,theme_type=theme_type,is_uniform=is_uniform)
     
@@ -94,8 +97,12 @@ def draw(draw_info, algorithms, back_button, mode_button, sound_button, options,
 def draw_list(draw_info, color_positions={}, theme_type='Default', clear_bg=False, is_uniform=False):
     lst = draw_info.lst
     if clear_bg:
-        clear_rect = (SIDE_PADDING//2, TOP_PADDING, (draw_info.width-SIDE_PADDING), (draw_info.height-TOP_PADDING))
-        pygame.draw.rect(draw_info.window, themes[theme_type]['plane_color'], clear_rect)
+        if theme_type == 'Synth':
+            clear_rect = (SIDE_PADDING//2, TOP_PADDING, (draw_info.width-SIDE_PADDING), (draw_info.height-TOP_PADDING))
+            pygame.draw.rect(draw_info.window, BLACK, clear_rect)
+        else:
+            clear_rect = (SIDE_PADDING//2, TOP_PADDING, (draw_info.width-SIDE_PADDING), (draw_info.height-TOP_PADDING))
+            pygame.draw.rect(draw_info.window, themes[theme_type]['plane_color'], clear_rect)
 
     if not is_uniform:
         # Set the font and the width limit for the list area
