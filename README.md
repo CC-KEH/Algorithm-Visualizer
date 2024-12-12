@@ -1,8 +1,6 @@
 # Algorithm Visualizer
 
-<video controls src="demo.mp4" title="Title"></video>
-
-**Demo: `demo.mp4`**
+## **Demo: [YouTube](https://youtu.be/_2_kYKESWco)**
 
 This is a Python program that showcases various sorting and pathfinding algorithms. It uses the Pygame library for the graphical user interface and includes sound functionality for a more immersive user experience.
 
