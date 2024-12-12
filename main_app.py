@@ -1,8 +1,9 @@
-from grid import WIDTH
-import pygame
+import pygame, asyncio
+
 import sys
 import maze_main
 import sort_main
+from grid import WIDTH
 pygame.init()
 # Constants
 WINDOW_WIDTH = 1500

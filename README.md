@@ -1,5 +1,9 @@
 # Algorithm Visualizer
 
+<video controls src="demo.mp4" title="Title"></video>
+
+**Demo: `demo.mp4`**
+
 This is a Python program that showcases various sorting and pathfinding algorithms. It uses the Pygame library for the graphical user interface and includes sound functionality for a more immersive user experience.
 
 ## Sorting Algorithms
@@ -41,6 +45,9 @@ This application includes sound effects to enhance the visualization experience.
 
 ```sh
 pip install -r requirements.txt
+
+python main_app.py
+
 ```
 
 ---
@@ -52,3 +59,5 @@ Contributions are welcome and greatly appreciated! You can contribute in many wa
 - Report bugs
 - Suggest new features
 - Write code
+
+---
